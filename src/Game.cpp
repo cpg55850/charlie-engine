@@ -1,11 +1,13 @@
 #include "Game.hpp"
-#include <stdio.h>
-#include <iostream>
+#include "TextureManager.hpp"
+
+SDL_Texture* playerTex;
+SDL_Rect srcR, destR;
 
 Game::Game() {}
 Game::~Game() {}
 
-void Game::init(const char *title, int xpos, int ypos, int width, int height,
+void Game::init(const char* title, int xpos, int ypos, int width, int height,
                 bool fullscreen) {
   int flags = 0;
 
@@ -31,6 +33,11 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height,
   } else {
     isRunning = false;
   }
+
+  playerTex = TextureManager::LoadTexture("assets/frog-standing-down-big.png", renderer);
+  // SDL_Surface* tmpSurface = IMG_Load("assets/frog-standing-down-big.png");
+  // playerTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+  // SDL_FreeSurface(tmpSurface);
 }
 
 void Game::handleEvents() {
@@ -44,12 +51,24 @@ void Game::handleEvents() {
       break;
   }
 }
-void Game::update() {}
+void Game::update() {
+  count++;
+  destR.h = 64 * 8;
+  destR.w = 64 * 8;
+  destR.x = sin(count) * 50;
+  // destR.y = sin(count) * 100;
+  // std::cout << count << std::endl;
+}
+
 void Game::render() {
   SDL_RenderClear(renderer);
+
   // This is where we would add stuff to render
+  SDL_RenderCopy(renderer, playerTex, NULL, &destR);
+
   SDL_RenderPresent(renderer);
 }
+
 void Game::clean() {
   SDL_DestroyWindow(window);
   SDL_DestroyRenderer(renderer);

@@ -1,3 +1,4 @@
+#pragma once
 /*This source code copyrighted by Lazy Foo' Productions 2004-2024
 and may not be redistributed without written permission.*/
 
@@ -5,7 +6,10 @@ and may not be redistributed without written permission.*/
 #include <SDL.h>
 // #include <SDL_image.h>
 // #include <SDL_ttf.h>
+#include <SDL_image.h>
 #include <stdio.h>
+
+#include <iostream>
 
 // #include <sstream>
 // #include <string>
@@ -26,6 +30,7 @@ class Game {
   bool running() { return isRunning; }
 
  private:
+  int count = 0;
   bool isRunning;
   SDL_Window *window;
   SDL_Renderer *renderer;
