@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ECS.h"
+#include "Components.h"
 
 class PositionComponent : public Component {
  private:
@@ -8,6 +8,16 @@ class PositionComponent : public Component {
   int yPos = 0;
 
  public:
+  PositionComponent() {
+    xPos = 0;
+    yPos = 0;
+  }
+
+  PositionComponent(int x, int y) {
+    xPos = x;
+    yPos = y;
+  }
+
   int x() { return xPos; }
   int y() { return yPos; }
 

@@ -1,19 +1,15 @@
 #include "Game.h"
 
-#include "GameObject.h"
 #include "TextureManager.h"
 #include "Map.h"
-#include "ECS.h"
-#include "Components.h"
+#include "ECS/Components.h"
 
-GameObject* player;
-// GameObject* enemy;
 Map* map;
 
 SDL_Renderer* Game::renderer = nullptr;
 
 Manager manager;
-auto& newPlayer(manager.addEntity());
+auto& player(manager.addEntity());
 
 Game::Game() {}
 Game::~Game() {}
@@ -45,16 +41,11 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     isRunning = false;
   }
 
-  player = new GameObject("assets/frog-standing-down-big.png", 0, 0);
-  // enemy = new GameObject("assets/frog-standing-down-big.png", 50, 50);
   map = new Map();
-  // playerTex =
-  // TextureManager::LoadTexture("assets/frog-standing-down-big.png", renderer);
-  // SDL_Surface* tmpSurface = IMG_Load("assets/frog-standing-down-big.png");
-  // playerTex = SDL_CreateTextureFromSurface(renderer, tmpSurface);
-  // SDL_FreeSurface(tmpSurface);
 
-  newPlayer.addComponent<PositionComponent>();
+  // Player
+  player.addComponent<PositionComponent>();
+  player.addComponent<SpriteComponent>("assets/grass.png");
 }
 
 void Game::handleEvents() {
@@ -69,25 +60,15 @@ void Game::handleEvents() {
   }
 }
 void Game::update() {
-  count++;
-  // destR.h = 64 * 8;
-  // destR.w = 64 * 8;
-  // destR.x = sin(count) * 50;
-  player->Update();
+  manager.refresh();
   manager.update();
-  std::cout << newPlayer.getComponent<PositionComponent>().x() << ", " << newPlayer.getComponent<PositionComponent>().y() << std::endl;
-  // enemy->Update();
-  // destR.y = sin(count) * 100;
-  // std::cout << count << std::endl;
 }
 
 void Game::render() {
   SDL_RenderClear(renderer);
 
   map->DrawMap();
-  // This is where we would add stuff to render
-  player->Render();
-  // enemy->Render();
+  manager.draw();
 
   SDL_RenderPresent(renderer);
 }
