@@ -2,9 +2,11 @@
 
 #include "GameObject.h"
 #include "TextureManager.h"
+#include "Map.h"
 
 GameObject* player;
-GameObject* enemy;
+// GameObject* enemy;
+Map* map;
 
 SDL_Renderer* Game::renderer = nullptr;
 
@@ -39,7 +41,8 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   }
 
   player = new GameObject("assets/frog-standing-down-big.png", 0, 0);
-  enemy = new GameObject("assets/frog-standing-down-big.png", 50, 50);
+  // enemy = new GameObject("assets/frog-standing-down-big.png", 50, 50);
+  map = new Map();
   // playerTex =
   // TextureManager::LoadTexture("assets/frog-standing-down-big.png", renderer);
   // SDL_Surface* tmpSurface = IMG_Load("assets/frog-standing-down-big.png");
@@ -64,7 +67,7 @@ void Game::update() {
   // destR.w = 64 * 8;
   // destR.x = sin(count) * 50;
   player->Update();
-  enemy->Update();
+  // enemy->Update();
   // destR.y = sin(count) * 100;
   // std::cout << count << std::endl;
 }
@@ -72,9 +75,10 @@ void Game::update() {
 void Game::render() {
   SDL_RenderClear(renderer);
 
+  map->DrawMap();
   // This is where we would add stuff to render
   player->Render();
-  enemy->Render();
+  // enemy->Render();
 
   SDL_RenderPresent(renderer);
 }
