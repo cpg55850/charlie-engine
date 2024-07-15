@@ -62,6 +62,10 @@ void Game::handleEvents() {
 void Game::update() {
   manager.refresh();
   manager.update();
+
+  if(player.getComponent<PositionComponent>().x() > 100) {
+    player.getComponent<SpriteComponent>().setTex("assets/dirt.png");
+  }
 }
 
 void Game::render() {
