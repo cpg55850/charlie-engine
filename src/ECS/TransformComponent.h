@@ -2,18 +2,19 @@
 
 #include "Components.h"
 
-class PositionComponent : public Component {
+// Position, rotation and scale
+class TransformComponent : public Component {
  private:
   int xPos = 0;
   int yPos = 0;
 
  public:
-  PositionComponent() {
+  TransformComponent() {
     xPos = 0;
     yPos = 0;
   }
 
-  PositionComponent(int x, int y) {
+  TransformComponent(int x, int y) {
     xPos = x;
     yPos = y;
   }
