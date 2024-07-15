@@ -3,6 +3,7 @@
 #include "TextureManager.h"
 #include "Map.h"
 #include "ECS/Components.h"
+#include "Vector2D.h"
 
 Map* map;
 
@@ -63,7 +64,8 @@ void Game::update() {
   manager.refresh();
   manager.update();
 
-  if(player.getComponent<TransformComponent>().x() > 100) {
+  player.getComponent<TransformComponent>().position.Add(Vector2D(5, 0));
+  if(player.getComponent<TransformComponent>().position.x > 500) {
     player.getComponent<SpriteComponent>().setTex("assets/dirt.png");
   }
 }
