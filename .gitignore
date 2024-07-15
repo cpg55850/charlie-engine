@@ -1,2 +1,4 @@
 .vscode
 game
+
+# wc -l *.cpp *.h
