@@ -47,9 +47,9 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
 
   const Uint8* state = SDL_GetKeyboardState(NULL);
   std::cout << "state is" << state << std::endl;
-  // if (state[SDL_SCANCODE_ESCAPE]) {
-  //   mIsRunning = false;
-  // }
+  if (state[SDL_SCANCODE_ESCAPE]) {
+    isRunning = false;
+  }
 
   // Player
   player.addComponent<TransformComponent>();
@@ -70,11 +70,6 @@ void Game::handleEvents() {
 void Game::update() {
   manager.refresh();
   manager.update();
-
-  // player.getComponent<TransformComponent>().position.Add(Vector2D(5, 0));
-  // if (player.getComponent<TransformComponent>().position.x > 500) {
-  //   player.getComponent<SpriteComponent>().setTex("assets/dirt.png");
-  // }
 }
 
 void Game::render() {
