@@ -1,13 +1,14 @@
 #include "Game.h"
 
-#include "TextureManager.h"
-#include "Map.h"
 #include "ECS/Components.h"
+#include "Map.h"
+#include "TextureManager.h"
 #include "Vector2D.h"
 
 Map* map;
 
 SDL_Renderer* Game::renderer = nullptr;
+SDL_Event Game::event;
 
 Manager manager;
 auto& player(manager.addEntity());
@@ -47,10 +48,10 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   // Player
   player.addComponent<TransformComponent>();
   player.addComponent<SpriteComponent>("assets/grass.png");
+  player.addComponent<KeyboardController>();
 }
 
 void Game::handleEvents() {
-  SDL_Event event;
   SDL_PollEvent(&event);
   switch (event.type) {
     case SDL_QUIT:
@@ -64,10 +65,10 @@ void Game::update() {
   manager.refresh();
   manager.update();
 
-  player.getComponent<TransformComponent>().position.Add(Vector2D(5, 0));
-  if(player.getComponent<TransformComponent>().position.x > 500) {
-    player.getComponent<SpriteComponent>().setTex("assets/dirt.png");
-  }
+  // player.getComponent<TransformComponent>().position.Add(Vector2D(5, 0));
+  // if (player.getComponent<TransformComponent>().position.x > 500) {
+  //   player.getComponent<SpriteComponent>().setTex("assets/dirt.png");
+  // }
 }
 
 void Game::render() {

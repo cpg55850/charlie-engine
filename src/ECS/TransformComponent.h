@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 #include "../Vector2D.h"
 #include "Components.h"
 
@@ -7,6 +9,10 @@
 class TransformComponent : public Component {
  public:
   Vector2D position;
+  Vector2D velocity;
+
+  int speed = 3;
+
   TransformComponent() {
     position.x = 0;
     position.y = 0;
@@ -17,5 +23,15 @@ class TransformComponent : public Component {
     position.y = y;
   }
 
-  void update() override {}
+  void init() override {
+    velocity.x = 0;
+    velocity.y = 0;
+  }
+
+  void update() override {
+    position.x += velocity.x * speed;
+    position.y += velocity.y * speed;
+    // std::cout << "Velocity: " << velocity.x << ", " << velocity.y <<
+    // std::endl;
+  }
 };
