@@ -11,7 +11,7 @@ class TransformComponent : public Component {
   Vector2D position;
   Vector2D velocity;
 
-  int speed = 3;
+  // int speed = 3;
 
   TransformComponent() {
     position.x = 0;
@@ -29,8 +29,8 @@ class TransformComponent : public Component {
   }
 
   void update() override {
-    position.x += velocity.x * speed;
-    position.y += velocity.y * speed;
+    position.x += velocity.x;
+    position.y += velocity.y;
     // std::cout << "Velocity: " << velocity.x << ", " << velocity.y <<
     // std::endl;
   }

@@ -45,10 +45,16 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
 
   map = new Map();
 
+  const Uint8* state = SDL_GetKeyboardState(NULL);
+  std::cout << "state is" << state << std::endl;
+  // if (state[SDL_SCANCODE_ESCAPE]) {
+  //   mIsRunning = false;
+  // }
+
   // Player
   player.addComponent<TransformComponent>();
   player.addComponent<SpriteComponent>("assets/grass.png");
-  player.addComponent<KeyboardController>();
+  player.addComponent<KeyboardController>(state);
 }
 
 void Game::handleEvents() {
