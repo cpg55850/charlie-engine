@@ -17,20 +17,16 @@ class TransformComponent : public Component {
 
   // int speed = 3;
 
-  TransformComponent() {
-    position.x = 0;
-    position.y = 0;
+  TransformComponent() { position.Zero(); }
+
+  TransformComponent(int sc) {
+    position.Zero();
+    scale = sc;
   }
 
   TransformComponent(float x, float y) {
     position.x = x;
     position.y = y;
-  }
-
-  TransformComponent(int sc) {
-    position.x = 0.0f;
-    position.y = 0.0f;
-    scale = sc;
   }
 
   TransformComponent(float x, float y, int h, int w, int sc) {
