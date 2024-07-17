@@ -10,6 +10,9 @@ and may not be redistributed without written permission.*/
 #include <stdio.h>
 
 #include <iostream>
+#include <vector>
+
+class ColliderComponent;
 
 // #include <sstream>
 // #include <string>
@@ -31,6 +34,7 @@ class Game {
 
   static SDL_Renderer *renderer;
   static SDL_Event event;
+  static std::vector<ColliderComponent *> colliders;
 
  private:
   int count = 0;

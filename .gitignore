@@ -1,4 +1,4 @@
 .vscode
 game
 
-# wc -l src/*.cpp src/*.h
+# wc -l src/**/*.cpp src/**/*.h

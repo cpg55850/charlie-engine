@@ -1,10 +1,10 @@
 #include "Game.h"
 
+#include "Collision.h"
 #include "ECS/Components.h"
 #include "Map.h"
 #include "TextureManager.h"
 #include "Vector2D.h"
-#include "Collision.h"
 
 Map* map;
 
@@ -15,12 +15,21 @@ Manager manager;
 auto& player(manager.addEntity());
 auto& wall(manager.addEntity());
 
+auto& tile0(manager.addEntity());
+auto& tile1(manager.addEntity());
+auto& tile2(manager.addEntity());
+
+std::vector<ColliderComponent*> Game::colliders;
+
 Game::Game() {}
 Game::~Game() {}
 
 void Game::init(const char* title, int xpos, int ypos, int width, int height,
                 bool fullscreen) {
   int flags = 0;
+
+  // Makes the window resizable and adds maximize support
+  flags = SDL_WINDOW_RESIZABLE;
 
   if (fullscreen) {
     flags = SDL_WINDOW_FULLSCREEN;
@@ -53,6 +62,14 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     isRunning = false;
   }
 
+  // Tiles
+  tile0.addComponent<TileComponent>(200, 200, 32, 32, 0);
+  tile1.addComponent<TileComponent>(250, 250, 32, 32, 1);
+  tile2.addComponent<TileComponent>(150, 150, 32, 32, 2);
+
+  tile1.addComponent<ColliderComponent>("dirt");
+  tile2.addComponent<ColliderComponent>("grass");
+
   // Player
   player.addComponent<TransformComponent>(2);
   player.addComponent<SpriteComponent>("assets/grass.png");
@@ -60,9 +77,9 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   player.addComponent<ColliderComponent>("player");
 
   // Wall
-  wall.addComponent<TransformComponent>(200.0f, 100.0f, 300, 20, 1);
-  wall.addComponent<SpriteComponent>("assets/dirt.png");
-  wall.addComponent<ColliderComponent>("wall");
+  // wall.addComponent<TransformComponent>(200.0f, 100.0f, 300, 20, 1);
+  // wall.addComponent<SpriteComponent>("assets/dirt.png");
+  // wall.addComponent<ColliderComponent>("wall");
 }
 
 void Game::handleEvents() {
@@ -79,17 +96,16 @@ void Game::update() {
   manager.refresh();
   manager.update();
 
-  if(Collision::AABB(player.getComponent<ColliderComponent>().collider, wall.getComponent<ColliderComponent>().collider)) {
-    // player.getComponent<TransformComponent>().scale = 1;
-    player.getComponent<TransformComponent>().velocity * -1;
-    std::cout << "Wall hit!" << std::endl;
+  for (auto cc : colliders) {
+    Collision::AABB(player.getComponent<ColliderComponent>(), *cc);
   }
+
 }
 
 void Game::render() {
   SDL_RenderClear(renderer);
 
-  map->DrawMap();
+  // map->DrawMap();
   manager.draw();
 
   SDL_RenderPresent(renderer);
