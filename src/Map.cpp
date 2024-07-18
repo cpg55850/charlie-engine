@@ -65,43 +65,4 @@ void Map::LoadMap(std::string path, int sizeX, int sizeY) {
       Game::AddTile(id, static_cast<int>(x) * 32, static_cast<int>(y) * 32);
     }
   }
-
-  // std::cout << "We reached the load map function" << std::endl;
-  // char tile;
-  // std::fstream mapFile;
-  // mapFile.open(path);
-
-  // if (!mapFile.is_open()) {
-  //   std::cerr << "Error: Failed to open file " << path << std::endl;
-  //   return;
-  // }
-
-  // // Read file contents into a stringstream
-  // std::stringstream buffer;
-  // buffer << mapFile.rdbuf();
-  // std::string mapContents = buffer.str();
-
-  // mapFile.close();
-
-  // std::vector<std::string> myTokens = splitString(mapContents, ',');
-
-  // int x = 0;
-  // int y = 0;
-
-  // for (const auto &token : myTokens) {
-  // std::cout << token << std::endl;
-  // Game::AddTile(x + y, x * 32, y * 32);
-  // }
-
-  // for (int y = 0; y < sizeY; y++) {
-  // for (int x = 0; x < sizeX; x++) {
-  // mapFile.get(tile);  // placed into tile
-  // int numTile = tile - '0';
-  // std::cout << "the numTile is " << tile << std::endl;
-  // Game::AddTile(, x * 32, y * 32);
-  // mapFile.ignore();
-  // }
-  // }
-
-  // mapFile.close();
 }
