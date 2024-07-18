@@ -70,7 +70,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   // tile1.addComponent<ColliderComponent>("dirt");
   // tile2.addComponent<ColliderComponent>("grass");
 
-  Map::LoadMap("assets/WHAT.csv", 16, 16);
+  Map::LoadMap("assets/WHAT.csv", 4, 4);
 
   // Player
   player.addComponent<TransformComponent>(2);
