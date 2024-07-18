@@ -15,9 +15,9 @@ Manager manager;
 auto& player(manager.addEntity());
 auto& wall(manager.addEntity());
 
-auto& tile0(manager.addEntity());
-auto& tile1(manager.addEntity());
-auto& tile2(manager.addEntity());
+// auto& tile0(manager.addEntity());
+// auto& tile1(manager.addEntity());
+// auto& tile2(manager.addEntity());
 
 std::vector<ColliderComponent*> Game::colliders;
 
@@ -63,12 +63,14 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   }
 
   // Tiles
-  tile0.addComponent<TileComponent>(200, 200, 32, 32, 0);
-  tile1.addComponent<TileComponent>(250, 250, 32, 32, 1);
-  tile2.addComponent<TileComponent>(150, 150, 32, 32, 2);
+  // tile0.addComponent<TileComponent>(200, 200, 32, 32, 0);
+  // tile1.addComponent<TileComponent>(250, 250, 32, 32, 1);
+  // tile2.addComponent<TileComponent>(150, 150, 32, 32, 2);
 
-  tile1.addComponent<ColliderComponent>("dirt");
-  tile2.addComponent<ColliderComponent>("grass");
+  // tile1.addComponent<ColliderComponent>("dirt");
+  // tile2.addComponent<ColliderComponent>("grass");
+
+  Map::LoadMap("assets/WHAT.csv", 16, 16);
 
   // Player
   player.addComponent<TransformComponent>(2);
@@ -99,13 +101,11 @@ void Game::update() {
   for (auto cc : colliders) {
     Collision::AABB(player.getComponent<ColliderComponent>(), *cc);
   }
-
 }
 
 void Game::render() {
   SDL_RenderClear(renderer);
 
-  // map->DrawMap();
   manager.draw();
 
   SDL_RenderPresent(renderer);
@@ -116,4 +116,9 @@ void Game::clean() {
   SDL_DestroyRenderer(renderer);
   SDL_Quit();
   std::cout << "Game cleaned" << std::endl;
+}
+
+void Game::AddTile(int id, int x, int y) {
+  auto& tile(manager.addEntity());
+  tile.addComponent<TileComponent>(x, y, 32, 32, id);
 }
