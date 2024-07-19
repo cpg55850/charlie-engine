@@ -80,8 +80,8 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   Map::LoadMap("assets/WHAT.csv", 4, 4);
 
   // Player
-  player.addComponent<TransformComponent>(2);
-  player.addComponent<SpriteComponent>("assets/grass.png");
+  player.addComponent<TransformComponent>(4);
+  player.addComponent<SpriteComponent>("assets/walk-right.png", 2, 100);
   player.addComponent<KeyboardController>(state);
   player.addComponent<ColliderComponent>("player");
   player.addGroup(groupPlayers);
