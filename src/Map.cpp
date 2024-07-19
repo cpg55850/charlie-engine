@@ -28,8 +28,7 @@ std::vector<std::string> Map::splitString(const std::string &s,
 }
 
 void Map::LoadMap(std::string path, int sizeX, int sizeY) {
-  std::ifstream infile(
-      "assets/WHAT.csv");  // Replace "map.csv" with your file name
+  std::ifstream infile(path);  // Replace "map.csv" with your file name
 
   if (!infile) {
     std::cerr << "Error opening file!" << std::endl;

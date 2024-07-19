@@ -15,6 +15,13 @@ Manager manager;
 auto& player(manager.addEntity());
 auto& wall(manager.addEntity());
 
+enum groupLabels : std::size_t {
+  groupMap,
+  groupPlayers,
+  groupEnemies,
+  groupColliders
+};
+
 // auto& tile0(manager.addEntity());
 // auto& tile1(manager.addEntity());
 // auto& tile2(manager.addEntity());
@@ -77,6 +84,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   player.addComponent<SpriteComponent>("assets/grass.png");
   player.addComponent<KeyboardController>(state);
   player.addComponent<ColliderComponent>("player");
+  player.addGroup(groupPlayers);
 
   // Wall
   // wall.addComponent<TransformComponent>(200.0f, 100.0f, 300, 20, 1);
