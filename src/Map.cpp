@@ -52,6 +52,20 @@ void Map::LoadMap(std::string path, int sizeX, int sizeY) {
 
   infile.close();
 
+  int srcX, srcY;
+
+  // 0
+  // 0 0
+
+  // 1
+  // 16 0
+
+  // 2
+  // 0 16
+
+  // 3
+  // 16 16
+
   // Iterate through the matrix and call addTile
   for (size_t y = 0; y < matrix.size(); ++y) {
     for (size_t x = 0; x < matrix[y].size(); ++x) {
@@ -60,8 +74,13 @@ void Map::LoadMap(std::string path, int sizeX, int sizeY) {
       if (id == -1) {
         continue;
       }
+
+      int srcX = (id % 2) * 16;
+      int srcY = (id / 2) * 16;
+
       // createTile(id, static_cast<int>(x), static_cast<int>(y));
-      Game::AddTile(id, static_cast<int>(x) * 32, static_cast<int>(y) * 32);
+      // Game::AddTile(id, static_cast<int>(x) * 32, static_cast<int>(y) * 32);
+      Game::AddTile(srcX, srcY, x * 32, y * 32);
     }
   }
 }

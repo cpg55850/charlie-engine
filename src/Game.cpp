@@ -11,9 +11,13 @@ Map* map;
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
 
+SDL_Rect Game::camera = {0, 0, 800, 640};
+
 Manager manager;
 auto& player(manager.addEntity());
 auto& wall(manager.addEntity());
+
+const char* mapfile = "assets/tiles.png";
 
 enum groupLabels : std::size_t {
   groupMap,
@@ -61,7 +65,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     isRunning = false;
   }
 
-  map = new Map();
+  // map = new Map();
 
   const Uint8* state = SDL_GetKeyboardState(NULL);
   std::cout << "state is" << state << std::endl;
@@ -109,6 +113,22 @@ void Game::update() {
   manager.refresh();
   manager.update();
 
+  camera.x = player.getComponent<TransformComponent>().position.x - 400;
+  camera.y = player.getComponent<TransformComponent>().position.x - 320;
+
+  if (camera.x < 0) {
+    camera.x = 0;
+  }
+  if (camera.y < 0) {
+    camera.y = 0;
+  }
+  if (camera.x > camera.w) {
+    camera.x = camera.w;
+  }
+  if (camera.y > camera.h) {
+    camera.y = camera.h;
+  }
+
   for (auto cc : colliders) {
     Collision::AABB(player.getComponent<ColliderComponent>(), *cc);
   }
@@ -122,13 +142,13 @@ void Game::render() {
   SDL_RenderClear(renderer);
 
   // manager.draw();
-  for(auto& t : tiles) {
+  for (auto& t : tiles) {
     t->draw();
   }
-  for(auto& p : players) {
+  for (auto& p : players) {
     p->draw();
   }
-  for(auto& e : enemies) {
+  for (auto& e : enemies) {
     e->draw();
   }
 
@@ -142,8 +162,8 @@ void Game::clean() {
   std::cout << "Game cleaned" << std::endl;
 }
 
-void Game::AddTile(int id, int x, int y) {
+void Game::AddTile(int srcX, int srcY, int xPos, int yPos) {
   auto& tile(manager.addEntity());
-  tile.addComponent<TileComponent>(x, y, 32, 32, id);
+  tile.addComponent<TileComponent>(srcX, srcY, xPos, yPos, mapfile);
   tile.addGroup(groupMap);
 }
