@@ -15,5 +15,5 @@ void TextureManager::Draw(SDL_Texture* tex, SDL_Rect src, SDL_Rect dest,
   SDL_Rect outputRect = dest;
   outputRect.x = dest.x - Game::camera.getX() + 450;
   outputRect.y = dest.y - Game::camera.getY() + 250;
-  SDL_RenderCopyEx(Game::renderer, tex, &src, &outputRect, NULL, NULL, flip);
+  SDL_RenderCopyEx(Game::renderer, tex, &src, &outputRect, 0.0, NULL, flip);
 }

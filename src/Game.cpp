@@ -1,11 +1,12 @@
 #include "Game.h"
 
+#include "Camera.h"
 #include "Collision.h"
 #include "ECS/Components.h"
 #include "Map.h"
 #include "TextureManager.h"
 #include "Vector2D.h"
-#include "Camera.h"
+#include "ECS/Animation.h"
 
 Map* map;
 
@@ -30,7 +31,6 @@ enum groupLabels : std::size_t {
 auto& tiles(manager.getGroup(groupMap));
 auto& players(manager.getGroup(groupPlayers));
 auto& enemies(manager.getGroup(groupEnemies));
-
 
 // auto& tile0(manager.addEntity());
 // auto& tile1(manager.addEntity());
@@ -57,7 +57,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
 
     window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
     // if (window) {
-      // std::cout << "Window created!" << std::endl;
+    // std::cout << "Window created!" << std::endl;
     // }
 
     renderer = SDL_CreateRenderer(window, -1, 0);
@@ -92,7 +92,13 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   // Player
   player.addComponent<TransformComponent>(4);
   // player.addComponent<SpriteComponent>("assets/idle.png", false);
-  player.addComponent<SpriteComponent>("assets/walk-right.png", true);
+  // player.addComponent<SpriteComponent>("assets/walk-right.png", true);
+  // "assets/walk-right.png", true, Animation(0, 2, 100), "Walk"
+  player.addComponent<SpriteComponent>();
+  player.getComponent<SpriteComponent>().addTex("assets/walk-right.png", true, Animation(0, 2, 100), "WalkX");
+  player.getComponent<SpriteComponent>().addTex("assets/walk-up.png", true, Animation(0, 2, 100), "WalkUp");
+  player.getComponent<SpriteComponent>().addTex("assets/walk-down.png", true, Animation(0, 2, 100), "WalkDown");
+  player.getComponent<SpriteComponent>().playTex("assets/walk-right.png", "WalkX");
 
   player.addComponent<KeyboardController>(state);
   player.addComponent<ColliderComponent>("player");
@@ -119,7 +125,28 @@ void Game::update() {
   manager.refresh();
   manager.update();
 
-  camera.update(player.getComponent<TransformComponent>().position.x, player.getComponent<TransformComponent>().position.y, 16, 16);
+  camera.update(player.getComponent<TransformComponent>().position.x,
+                player.getComponent<TransformComponent>().position.y, 16, 16);
+
+  // Player Update
+  int xAxis = player.getComponent<TransformComponent>().velocity.x;
+  int yAxis = player.getComponent<TransformComponent>().velocity.y;
+
+  if(xAxis > 0) {
+    std::cout << "Going right" << std::endl;
+    player.getComponent<SpriteComponent>().playTex("assets/walk-right.png", "WalkX");
+  } else if (xAxis < 0) {
+    std::cout << "Going left" << std::endl;
+    player.getComponent<SpriteComponent>().playTex("assets/walk-right.png", "WalkX");
+  };
+
+  if(yAxis < 0) {
+    std::cout << "Going up" << std::endl;
+    player.getComponent<SpriteComponent>().playTex("assets/walk-up.png", "WalkUp");
+  } else if (yAxis > 0) {
+    std::cout << "Going down" << std::endl;
+    player.getComponent<SpriteComponent>().playTex("assets/walk-down.png", "WalkDown");
+  };
 
   // Vector2D pVel = player.getComponent<TransformComponent>().velocity;
   // int pSpeed = player.getComponent<TransformComponent>().speed;
@@ -131,8 +158,9 @@ void Game::update() {
 
 void Game::render() {
   SDL_RenderClear(renderer);
-  
-  // camera.render(player.getComponent<TransformComponent>().position.x, player.getComponent<TransformComponent>().position.y);
+
+  // camera.render(player.getComponent<TransformComponent>().position.x,
+  // player.getComponent<TransformComponent>().position.y);
 
   // manager.draw();
   for (auto& t : tiles) {
@@ -146,7 +174,6 @@ void Game::render() {
   }
 
   SDL_RenderPresent(renderer);
-
 }
 
 void Game::clean() {

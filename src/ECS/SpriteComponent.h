@@ -27,19 +27,45 @@ class SpriteComponent : public Component {
   SpriteComponent(const char *path) { setTex(path); }
   ~SpriteComponent() { SDL_DestroyTexture(texture); }
 
-  SpriteComponent(const char *path, bool _isAnimated) {
+  SpriteComponent(const char *path, bool _isAnimated, Animation anim,
+                  const char *animName) {
     isAnimated = _isAnimated;
-    Animation idle = Animation(0, 1, 100);
-    Animation walk = Animation(0, 2, 100);
+    // Animation idle = Animation(0, 1, 100);
+    // Animation walk = Animation(0, 2, 100);
 
-    animations.emplace("Idle", idle);
-    animations.emplace("Walk", walk);
+    // animations.emplace("Idle", idle);
+    animations.emplace(animName, anim);
 
-    play("Walk");
+    play(animName);
     setTex(path);
   }
 
   void setTex(const char *path) { texture = TextureManager::LoadTexture(path); }
+
+  void addTex(const char *path, bool _isAnimated, Animation anim,
+              const char *animName) {
+    isAnimated = _isAnimated;
+    // Animation idle = Animation(0, 1, 100);
+    // Animation walk = Animation(0, 2, 100);
+
+    // animations.emplace("Idle", idle);
+    animations.emplace(animName, anim);
+
+    // play(animName);
+    // setTex(path);
+  }
+
+  void playTex(const char *path, const char *animName) {
+    // isAnimated = _isAnimated;
+    // // Animation idle = Animation(0, 1, 100);
+    // // Animation walk = Animation(0, 2, 100);
+
+    // // animations.emplace("Idle", idle);
+    // animations.emplace(animName, anim);
+
+    play(animName);
+    setTex(path);
+  }
 
   void init() override {
     transform = &entity->getComponent<TransformComponent>();
