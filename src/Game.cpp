@@ -5,13 +5,14 @@
 #include "Map.h"
 #include "TextureManager.h"
 #include "Vector2D.h"
+#include "Camera.h"
 
 Map* map;
 
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
 
-SDL_Rect Game::camera = {0, 0, 800, 640};
+Camera Game::camera = Camera(0, 0, 1920, 1080, 2000, 2000);
 
 Manager manager;
 auto& player(manager.addEntity());
@@ -25,6 +26,11 @@ enum groupLabels : std::size_t {
   groupEnemies,
   groupColliders
 };
+
+auto& tiles(manager.getGroup(groupMap));
+auto& players(manager.getGroup(groupPlayers));
+auto& enemies(manager.getGroup(groupEnemies));
+
 
 // auto& tile0(manager.addEntity());
 // auto& tile1(manager.addEntity());
@@ -50,14 +56,14 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     std::cout << "Subsystems initialised!..." << std::endl;
 
     window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
-    if (window) {
-      std::cout << "Window created!" << std::endl;
-    }
+    // if (window) {
+      // std::cout << "Window created!" << std::endl;
+    // }
 
     renderer = SDL_CreateRenderer(window, -1, 0);
     if (renderer) {
       SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-      std::cout << "Renderer created!" << std::endl;
+      // std::cout << "Renderer created!" << std::endl;
 
       isRunning = true;
     }
@@ -68,7 +74,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   // map = new Map();
 
   const Uint8* state = SDL_GetKeyboardState(NULL);
-  std::cout << "state is" << state << std::endl;
+  // std::cout << "state is" << state << std::endl;
   if (state[SDL_SCANCODE_ESCAPE]) {
     isRunning = false;
   }
@@ -113,33 +119,20 @@ void Game::update() {
   manager.refresh();
   manager.update();
 
-  camera.x = player.getComponent<TransformComponent>().position.x - 400;
-  camera.y = player.getComponent<TransformComponent>().position.x - 320;
+  camera.update(player.getComponent<TransformComponent>().position.x, player.getComponent<TransformComponent>().position.y, 16, 16);
 
-  if (camera.x < 0) {
-    camera.x = 0;
-  }
-  if (camera.y < 0) {
-    camera.y = 0;
-  }
-  if (camera.x > camera.w) {
-    camera.x = camera.w;
-  }
-  if (camera.y > camera.h) {
-    camera.y = camera.h;
-  }
+  // Vector2D pVel = player.getComponent<TransformComponent>().velocity;
+  // int pSpeed = player.getComponent<TransformComponent>().speed;
 
   for (auto cc : colliders) {
     Collision::AABB(player.getComponent<ColliderComponent>(), *cc);
   }
 }
 
-auto& tiles(manager.getGroup(groupMap));
-auto& players(manager.getGroup(groupPlayers));
-auto& enemies(manager.getGroup(groupEnemies));
-
 void Game::render() {
   SDL_RenderClear(renderer);
+  
+  // camera.render(player.getComponent<TransformComponent>().position.x, player.getComponent<TransformComponent>().position.y);
 
   // manager.draw();
   for (auto& t : tiles) {
@@ -153,6 +146,7 @@ void Game::render() {
   }
 
   SDL_RenderPresent(renderer);
+
 }
 
 void Game::clean() {

@@ -12,6 +12,8 @@ and may not be redistributed without written permission.*/
 #include <iostream>
 #include <vector>
 
+#include "Camera.h"
+
 class ColliderComponent;
 
 // #include <sstream>
@@ -36,7 +38,7 @@ class Game {
   static SDL_Renderer *renderer;
   static SDL_Event event;
   static std::vector<ColliderComponent *> colliders;
-  static SDL_Rect camera;
+  static Camera camera;
 
  private:
   int count = 0;

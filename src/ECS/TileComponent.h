@@ -17,7 +17,7 @@ class TileComponent : public Component {
   ~TileComponent() { SDL_DestroyTexture(texture); }
 
   TileComponent(int srcX, int srcY, int xPos, int yPos, const char* path) {
-    std::cout << "Hi from tile comopnent " << std::endl << path;
+    // std::cout << "Hi from tile comopnent " << std::endl << path;
     texture = TextureManager::LoadTexture(path);
     srcRect.x = srcX;
     srcRect.y = srcY;
@@ -29,6 +29,14 @@ class TileComponent : public Component {
   }
 
   void draw() override {
+    // SDL_Rect outputRect = {destRect.x + Game::camera.getX(),
+    //  destRect.y + Game::camera.getY()};
+
+    // destRect.x = destRect.x - Game::camera.getX();
+    // destRect.y = destRect.y - Game::camera.getY();
+
+    // std::cout << outputRect.x << " " << outputRect.y << std::endl;
+
     TextureManager::Draw(texture, srcRect, destRect, SDL_FLIP_NONE);
   }
 };

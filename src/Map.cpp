@@ -70,7 +70,7 @@ void Map::LoadMap(std::string path, int sizeX, int sizeY) {
   for (size_t y = 0; y < matrix.size(); ++y) {
     for (size_t x = 0; x < matrix[y].size(); ++x) {
       int id = matrix[y][x];
-      std::cout << id << std::endl;
+      // std::cout << id << std::endl;
       if (id == -1) {
         continue;
       }
