@@ -39,6 +39,11 @@ class TransformComponent : public Component {
     scale = sc;
   }
 
+  void setPosition(float x, float y) {
+    position.x = x;
+    position.y = y;
+  }
+
   void init() override {
     velocity.x = 0;
     velocity.y = 0;

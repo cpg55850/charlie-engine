@@ -7,6 +7,8 @@
 
 class PlayerComponent : public Component {
  public:
+  bool wasPressed = false;
+
   void init() override {
     // Custom initialization code for CustomScript
     std::cout << "CustomScript initialized!" << std::endl;
@@ -38,24 +40,33 @@ class PlayerComponent : public Component {
     int yAxis = entity->getComponent<TransformComponent>().velocity.y;
 
     if (xAxis > 0) {
-      std::cout << "Going right" << std::endl;
+      // std::cout << "Going right" << std::endl;
       entity->getComponent<SpriteComponent>().playTex("assets/walk-right.png",
                                                       "WalkX");
     } else if (xAxis < 0) {
-      std::cout << "Going left" << std::endl;
+      // std::cout << "Going left" << std::endl;
       entity->getComponent<SpriteComponent>().playTex("assets/walk-right.png",
                                                       "WalkX");
     };
 
     if (yAxis < 0) {
-      std::cout << "Going up" << std::endl;
+      // std::cout << "Going up" << std::endl;
       entity->getComponent<SpriteComponent>().playTex("assets/walk-up.png",
                                                       "WalkUp");
     } else if (yAxis > 0) {
-      std::cout << "Going down" << std::endl;
+      // std::cout << "Going down" << std::endl;
       entity->getComponent<SpriteComponent>().playTex("assets/walk-down.png",
                                                       "WalkDown");
     };
+    const Uint8* state = SDL_GetKeyboardState(NULL);
+    bool isPressed = state[SDL_SCANCODE_SPACE];
+    // std::cout << "state is" << state << std::endl;
+    if (state[SDL_SCANCODE_SPACE] && !wasPressed) {
+      std::cout << "Bullet time" << std::endl;
+      // auto& bullet(Game::manager.addEntity());
+    }
+
+    wasPressed = isPressed;
   }
 
   void draw() override {

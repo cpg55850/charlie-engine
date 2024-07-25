@@ -19,6 +19,7 @@ Camera Game::camera = Camera(0, 0, 1920, 1080, 2000, 2000);
 Manager manager;
 auto& player(manager.addEntity());
 auto& wall(manager.addEntity());
+auto& bullet(manager.addEntity());
 
 const char* mapfile = "assets/tiles.png";
 
@@ -84,8 +85,10 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
 
   player.addGroup(groupPlayers);
   wall.addGroup(groupMap);
+  bullet.addGroup(groupEnemies);
 
   player.addComponent<PlayerComponent>();
+  bullet.addComponent<BulletComponent>();
 
   for (auto& p : players) {
     p->init();
