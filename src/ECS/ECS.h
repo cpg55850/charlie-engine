@@ -43,6 +43,9 @@ class Component {
 class Entity {
  public:
   Entity(Manager& mManager) : manager(mManager) {}
+  void init() {
+    for (auto& c : components) c->update();
+  }
   void update() {
     for (auto& c : components) c->update();
   }

@@ -2,11 +2,12 @@
 
 #include "Camera.h"
 #include "Collision.h"
+#include "ECS/Animation.h"
 #include "ECS/Components.h"
 #include "Map.h"
 #include "TextureManager.h"
 #include "Vector2D.h"
-#include "ECS/Animation.h"
+#include "scripts/ScriptComponents.h"
 
 Map* map;
 
@@ -79,36 +80,16 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     isRunning = false;
   }
 
-  // Tiles
-  // tile0.addComponent<TileComponent>(200, 200, 32, 32, 0);
-  // tile1.addComponent<TileComponent>(250, 250, 32, 32, 1);
-  // tile2.addComponent<TileComponent>(150, 150, 32, 32, 2);
-
-  // tile1.addComponent<ColliderComponent>("dirt");
-  // tile2.addComponent<ColliderComponent>("grass");
-
   Map::LoadMap("assets/WHAT.csv", 4, 4);
 
-  // Player
-  player.addComponent<TransformComponent>(4);
-  // player.addComponent<SpriteComponent>("assets/idle.png", false);
-  // player.addComponent<SpriteComponent>("assets/walk-right.png", true);
-  // "assets/walk-right.png", true, Animation(0, 2, 100), "Walk"
-  player.addComponent<SpriteComponent>();
-  player.getComponent<SpriteComponent>().addTex("assets/walk-right.png", true, Animation(0, 2, 100), "WalkX");
-  player.getComponent<SpriteComponent>().addTex("assets/walk-up.png", true, Animation(0, 2, 100), "WalkUp");
-  player.getComponent<SpriteComponent>().addTex("assets/walk-down.png", true, Animation(0, 2, 100), "WalkDown");
-  player.getComponent<SpriteComponent>().playTex("assets/walk-right.png", "WalkX");
-
-  player.addComponent<KeyboardController>(state);
-  player.addComponent<ColliderComponent>("player");
   player.addGroup(groupPlayers);
-
-  // Wall
-  // wall.addComponent<TransformComponent>(200.0f, 100.0f, 300, 20, 1);
-  // wall.addComponent<SpriteComponent>("assets/dirt.png");
-  // wall.addComponent<ColliderComponent>("wall");
   wall.addGroup(groupMap);
+
+  player.addComponent<PlayerComponent>();
+
+  for (auto& p : players) {
+    p->init();
+  }
 }
 
 void Game::handleEvents() {
@@ -128,29 +109,6 @@ void Game::update() {
   camera.update(player.getComponent<TransformComponent>().position.x,
                 player.getComponent<TransformComponent>().position.y, 16, 16);
 
-  // Player Update
-  int xAxis = player.getComponent<TransformComponent>().velocity.x;
-  int yAxis = player.getComponent<TransformComponent>().velocity.y;
-
-  if(xAxis > 0) {
-    std::cout << "Going right" << std::endl;
-    player.getComponent<SpriteComponent>().playTex("assets/walk-right.png", "WalkX");
-  } else if (xAxis < 0) {
-    std::cout << "Going left" << std::endl;
-    player.getComponent<SpriteComponent>().playTex("assets/walk-right.png", "WalkX");
-  };
-
-  if(yAxis < 0) {
-    std::cout << "Going up" << std::endl;
-    player.getComponent<SpriteComponent>().playTex("assets/walk-up.png", "WalkUp");
-  } else if (yAxis > 0) {
-    std::cout << "Going down" << std::endl;
-    player.getComponent<SpriteComponent>().playTex("assets/walk-down.png", "WalkDown");
-  };
-
-  // Vector2D pVel = player.getComponent<TransformComponent>().velocity;
-  // int pSpeed = player.getComponent<TransformComponent>().speed;
-
   for (auto cc : colliders) {
     Collision::AABB(player.getComponent<ColliderComponent>(), *cc);
   }
@@ -159,10 +117,6 @@ void Game::update() {
 void Game::render() {
   SDL_RenderClear(renderer);
 
-  // camera.render(player.getComponent<TransformComponent>().position.x,
-  // player.getComponent<TransformComponent>().position.y);
-
-  // manager.draw();
   for (auto& t : tiles) {
     t->draw();
   }
