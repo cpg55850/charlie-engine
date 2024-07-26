@@ -16,23 +16,18 @@ SDL_Event Game::event;
 
 Camera Game::camera = Camera(0, 0, 1920, 1080, 2000, 2000);
 
-Manager manager;
-auto& player(manager.addEntity());
-auto& wall(manager.addEntity());
-auto& bullet(manager.addEntity());
+Manager Game::manager = Manager();
+
+auto& player(Game::manager.addEntity());
+auto& wall(Game::manager.addEntity());
+auto& bullet(Game::manager.addEntity());
+auto& bullet2(Game::manager.addEntity());
 
 const char* mapfile = "assets/tiles.png";
 
-enum groupLabels : std::size_t {
-  groupMap,
-  groupPlayers,
-  groupEnemies,
-  groupColliders
-};
-
-auto& tiles(manager.getGroup(groupMap));
-auto& players(manager.getGroup(groupPlayers));
-auto& enemies(manager.getGroup(groupEnemies));
+auto& tiles(Game::manager.getGroup(Game::groupMap));
+auto& players(Game::manager.getGroup(Game::groupPlayers));
+auto& enemies(Game::manager.getGroup(Game::groupEnemies));
 
 // auto& tile0(manager.addEntity());
 // auto& tile1(manager.addEntity());
@@ -86,13 +81,11 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   player.addGroup(groupPlayers);
   wall.addGroup(groupMap);
   bullet.addGroup(groupEnemies);
+  bullet2.addGroup(groupEnemies);
 
   player.addComponent<PlayerComponent>();
-  bullet.addComponent<BulletComponent>();
-
-  for (auto& p : players) {
-    p->init();
-  }
+  // bullet.addComponent<BulletComponent>();
+  bullet2.addComponent<BulletComponent>();
 }
 
 void Game::handleEvents() {

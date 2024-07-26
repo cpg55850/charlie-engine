@@ -24,7 +24,7 @@ inline ComponentID getComponentTypeID() noexcept {
   return typeID;
 }
 
-constexpr std::size_t maxComponents = 32;
+constexpr std::size_t maxComponents = 999999;
 constexpr std::size_t maxGroups = 32;
 
 using ComponentBitset = std::bitset<maxComponents>;
@@ -44,7 +44,7 @@ class Entity {
  public:
   Entity(Manager& mManager) : manager(mManager) {}
   void init() {
-    for (auto& c : components) c->update();
+    for (auto& c : components) c->init();
   }
   void update() {
     for (auto& c : components) c->update();
@@ -95,10 +95,16 @@ class Entity {
 
 class Manager {
  private:
-  std::vector<std::unique_ptr<Entity>> entities;
   std::array<std::vector<Entity*>, maxGroups> groupedEntities;
 
  public:
+  // std::vector<std::unique_ptr<Entity>> entities;
+  std::vector<std::unique_ptr<Entity>>
+      entities;  // Use unique_ptr in the container
+
+  void init() {
+    for (auto& e : entities) e->init();
+  }
   void update() {
     for (auto& e : entities) e->update();
   }
@@ -132,9 +138,14 @@ class Manager {
   }
 
   Entity& addEntity() {
-    Entity* e = new Entity(*this);
-    std::unique_ptr<Entity> uPtr{e};
-    entities.emplace_back(std::move(uPtr));
-    return *e;
+    std::cout << "Making new entity" << std::endl;
+    // Entity* e = new Entity(*this);
+    // std::unique_ptr<Entity> uPtr{e};
+    // entities.emplace_back(std::move(uPtr));
+    // return *e;
+    auto e = std::make_unique<Entity>(
+        *this);                        // Use smart pointer to create new entity
+    entities.push_back(std::move(e));  // Store the unique_ptr in the container
+    return *entities.back();  // Return a reference to the newly added entity
   }
 };

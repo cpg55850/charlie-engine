@@ -63,7 +63,13 @@ class PlayerComponent : public Component {
     // std::cout << "state is" << state << std::endl;
     if (state[SDL_SCANCODE_SPACE] && !wasPressed) {
       std::cout << "Bullet time" << std::endl;
-      // auto& bullet(Game::manager.addEntity());
+      auto& bullet(Game::manager.addEntity());
+      std::cout << &bullet << std::endl;
+      bullet.addGroup(Game::groupLabels::groupEnemies);
+      bullet.addComponent<BulletComponent>();
+      bullet.getComponent<TransformComponent>().setPosition(
+          entity->getComponent<TransformComponent>().position.x,
+          entity->getComponent<TransformComponent>().position.y);
     }
 
     wasPressed = isPressed;

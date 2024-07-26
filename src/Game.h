@@ -13,6 +13,7 @@ and may not be redistributed without written permission.*/
 #include <vector>
 
 #include "Camera.h"
+#include "ECS/ECS.h"
 
 class ColliderComponent;
 
@@ -34,11 +35,18 @@ class Game {
 
   bool running() { return isRunning; }
 
+  static Manager manager;
   static void AddTile(int srcX, int srcY, int xPos, int yPos);
   static SDL_Renderer *renderer;
   static SDL_Event event;
   static std::vector<ColliderComponent *> colliders;
   static Camera camera;
+  enum groupLabels : std::size_t {
+    groupMap,
+    groupPlayers,
+    groupEnemies,
+    groupColliders
+  };
 
  private:
   int count = 0;
