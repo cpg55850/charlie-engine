@@ -59,6 +59,7 @@ class PlayerComponent : public Component {
       bullet.addComponent<BulletComponent>();
       auto& bulletTransform = bullet.getComponent<TransformComponent>();
       bulletTransform.setPosition(transform.position.x, transform.position.y);
+      Game::audioManager.playAudio("laser", 0, -1);
     }
 
     wasPressed = isPressed;

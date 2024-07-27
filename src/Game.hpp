@@ -12,6 +12,7 @@ and may not be redistributed without written permission.*/
 #include <iostream>
 #include <vector>
 
+#include "AudioManager.hpp"
 #include "Camera.hpp"
 #include "ECS/ECS.hpp"
 
@@ -36,6 +37,7 @@ class Game {
   bool running() { return isRunning; }
 
   static Manager manager;
+  static AudioManager audioManager;
   static void AddTile(int srcX, int srcY, int xPos, int yPos);
   static SDL_Renderer *renderer;
   static SDL_Event event;

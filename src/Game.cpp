@@ -17,6 +17,7 @@ SDL_Event Game::event;
 Camera Game::camera = Camera(0, 0, 1920, 1080, 2000, 2000);
 
 Manager Game::manager = Manager();
+AudioManager Game::audioManager;
 
 auto& player(Game::manager.addEntity());
 auto& wall(Game::manager.addEntity());
@@ -77,6 +78,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   }
 
   Map::LoadMap("assets/WHAT.csv", 4, 4);
+  audioManager.loadAudio("assets/laserShoot.wav", "laser");
 
   player.addGroup(groupPlayers);
   wall.addGroup(groupMap);
