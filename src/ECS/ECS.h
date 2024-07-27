@@ -42,94 +42,99 @@ class Component {
 
 class Entity {
  public:
-  Entity(Manager& mManager) : manager(mManager) {}
-  void init() {
-    for (auto& c : components) c->init();
+  Entity(Manager& mManager) : manager(mManager), active(true) {
+    componentArray.fill(nullptr);  // Ensure componentArray is initialized
+    componentBitSet.reset();       // Reset componentBitSet
   }
+
   void update() {
-    for (auto& c : components) c->update();
+    if (!active) return;  // Ensure the entity is active
+    for (auto& c : components) {
+      if (c) c->update();
+    }
   }
+
   void draw() {
-    for (auto& c : components) c->draw();
+    if (!active) return;  // Ensure the entity is active
+    for (auto& c : components) {
+      if (c) c->draw();
+    }
   }
+
   bool isActive() const { return active; }
   void destroy() { active = false; }
-  bool hasGroup(Group mGroup) { return groupBitset[mGroup]; }
+
+  bool hasGroup(Group mGroup) const { return groupBitset[mGroup]; }
+
   void addGroup(Group mGroup);
   void delGroup(Group mGroup) { groupBitset[mGroup] = false; }
 
   template <typename T>
   bool hasComponent() const {
-    return componentBitSet[getComponentTypeID<T>];
+    return componentBitSet[getComponentTypeID<T>()];
   }
 
   template <typename T, typename... TArgs>
   T& addComponent(TArgs&&... mArgs) {
-    T* c(new T(std::forward<TArgs>(mArgs)...));
+    auto c = std::make_unique<T>(std::forward<TArgs>(mArgs)...);
     c->entity = this;
-    std::unique_ptr<Component> uPtr{c};
-    components.emplace_back(std::move(uPtr));
-
-    componentArray[getComponentTypeID<T>()] = c;
+    T* rawPtr = c.get();
+    components.emplace_back(std::move(c));
+    componentArray[getComponentTypeID<T>()] = rawPtr;
     componentBitSet[getComponentTypeID<T>()] = true;
-
-    c->init();
-    return *c;
+    rawPtr->init();
+    return *rawPtr;
   }
 
   template <typename T>
   T& getComponent() const {
-    auto ptr(componentArray[getComponentTypeID<T>()]);
-    return *static_cast<T*>(ptr);
+    T* ptr = static_cast<T*>(componentArray[getComponentTypeID<T>()]);
+    if (!ptr) throw std::runtime_error("Component not found");
+    return *ptr;
   }
 
  private:
   Manager& manager;
-  bool active = true;
+  bool active;
   std::vector<std::unique_ptr<Component>> components;
-
   ComponentArray componentArray;
   ComponentBitset componentBitSet;
   GroupBitset groupBitset;
 };
 
 class Manager {
- private:
-  std::array<std::vector<Entity*>, maxGroups> groupedEntities;
-
  public:
-  // std::vector<std::unique_ptr<Entity>> entities;
-  std::vector<std::unique_ptr<Entity>>
-      entities;  // Use unique_ptr in the container
-
-  void init() {
-    for (auto& e : entities) e->init();
-  }
   void update() {
-    for (auto& e : entities) e->update();
+    for (auto& e : entities) {
+      if (e) e->update();
+    }
   }
+
   void draw() {
-    for (auto& e : entities) e->draw();
+    for (auto& e : entities) {
+      if (e) e->draw();
+    }
   }
+
   void refresh() {
-    for (auto i(0u); i < maxGroups; i++) {
-      auto& v(groupedEntities[i]);
-      v.erase(std::remove_if(std::begin(v), std::end(v),
+    for (auto i = 0u; i < maxGroups; i++) {
+      auto& v = groupedEntities[i];
+      v.erase(std::remove_if(v.begin(), v.end(),
                              [i](Entity* mEntity) {
                                return !mEntity->isActive() ||
                                       !mEntity->hasGroup(i);
                              }),
-              std::end(v));
+              v.end());
     }
 
-    entities.erase(std::remove_if(std::begin(entities), std::end(entities),
+    entities.erase(std::remove_if(entities.begin(), entities.end(),
                                   [](const std::unique_ptr<Entity>& mEntity) {
                                     return !mEntity->isActive();
                                   }),
-                   std::end(entities));
+                   entities.end());
   }
 
-  void AddToGroup(Entity* mEntity, Group mGroup) {
+  void addToGroup(Entity* mEntity, Group mGroup) {
     groupedEntities[mGroup].emplace_back(mEntity);
   }
 
@@ -138,14 +143,13 @@ class Manager {
   }
 
   Entity& addEntity() {
-    std::cout << "Making new entity" << std::endl;
-    // Entity* e = new Entity(*this);
-    // std::unique_ptr<Entity> uPtr{e};
-    // entities.emplace_back(std::move(uPtr));
-    // return *e;
-    auto e = std::make_unique<Entity>(
-        *this);                        // Use smart pointer to create new entity
-    entities.push_back(std::move(e));  // Store the unique_ptr in the container
-    return *entities.back();  // Return a reference to the newly added entity
+    auto e = std::make_unique<Entity>(*this);
+    Entity& ref = *e;
+    entities.push_back(std::move(e));
+    return ref;
   }
+
+ private:
+  std::array<std::vector<Entity*>, maxGroups> groupedEntities;
+  std::vector<std::unique_ptr<Entity>> entities;
 };

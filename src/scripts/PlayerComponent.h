@@ -1,4 +1,5 @@
 #pragma once
+
 #include <iostream>
 
 #include "../ECS/Animation.h"
@@ -10,73 +11,60 @@ class PlayerComponent : public Component {
   bool wasPressed = false;
 
   void init() override {
-    // Custom initialization code for CustomScript
-    std::cout << "CustomScript initialized!" << std::endl;
-    std::cout << entity << std::endl;
+    std::cout << "PlayerComponent initialized!" << std::endl;
+    std::cout << "Entity address: " << entity << std::endl;
 
-    entity->addComponent<TransformComponent>(4);
-    // entity->addComponent<SpriteComponent>("assets/idle.png", false);
-    // entity->addComponent<SpriteComponent>("assets/walk-right.png", true);
-    // "assets/walk-right.png", true, Animation(0, 2, 100), "Walk"
-    entity->addComponent<SpriteComponent>();
-    entity->getComponent<SpriteComponent>().addTex(
-        "assets/walk-right.png", true, Animation(0, 2, 100), "WalkX");
-    entity->getComponent<SpriteComponent>().addTex(
-        "assets/walk-up.png", true, Animation(0, 2, 100), "WalkUp");
-    entity->getComponent<SpriteComponent>().addTex(
-        "assets/walk-down.png", true, Animation(0, 2, 100), "WalkDown");
-    entity->getComponent<SpriteComponent>().playTex("assets/walk-right.png",
-                                                    "WalkX");
-    const Uint8* state = SDL_GetKeyboardState(NULL);
-    entity->addComponent<KeyboardController>(state);
+    // Initialize components only if not already present
+    if (!entity->hasComponent<TransformComponent>()) {
+      entity->addComponent<TransformComponent>(4);
+    }
+
+    if (!entity->hasComponent<SpriteComponent>()) {
+      auto& sprite = entity->addComponent<SpriteComponent>();
+      sprite.addTex("assets/walk-right.png", true, Animation(0, 2, 100),
+                    "WalkX");
+      sprite.addTex("assets/walk-up.png", true, Animation(0, 2, 100), "WalkUp");
+      sprite.addTex("assets/walk-down.png", true, Animation(0, 2, 100),
+                    "WalkDown");
+      sprite.playTex("assets/walk-right.png", "WalkX");
+    }
+
+    entity->addComponent<KeyboardController>(SDL_GetKeyboardState(NULL));
     entity->addComponent<ColliderComponent>("player");
   }
 
   void update() override {
-    // Custom update logic for CustomScript
-    // std::cout << "CustomScript updated!" << std::endl;
-    // Player Update
-    int xAxis = entity->getComponent<TransformComponent>().velocity.x;
-    int yAxis = entity->getComponent<TransformComponent>().velocity.y;
+    auto& transform = entity->getComponent<TransformComponent>();
+    auto& sprite = entity->getComponent<SpriteComponent>();
 
-    if (xAxis > 0) {
-      // std::cout << "Going right" << std::endl;
-      entity->getComponent<SpriteComponent>().playTex("assets/walk-right.png",
-                                                      "WalkX");
-    } else if (xAxis < 0) {
-      // std::cout << "Going left" << std::endl;
-      entity->getComponent<SpriteComponent>().playTex("assets/walk-right.png",
-                                                      "WalkX");
-    };
+    int xAxis = transform.velocity.x;
+    int yAxis = transform.velocity.y;
 
-    if (yAxis < 0) {
-      // std::cout << "Going up" << std::endl;
-      entity->getComponent<SpriteComponent>().playTex("assets/walk-up.png",
-                                                      "WalkUp");
-    } else if (yAxis > 0) {
-      // std::cout << "Going down" << std::endl;
-      entity->getComponent<SpriteComponent>().playTex("assets/walk-down.png",
-                                                      "WalkDown");
-    };
+    if (xAxis != 0) {
+      sprite.playTex("assets/walk-right.png", "WalkX");
+    }
+
+    if (yAxis != 0) {
+      sprite.playTex(yAxis < 0 ? "assets/walk-up.png" : "assets/walk-down.png",
+                     yAxis < 0 ? "WalkUp" : "WalkDown");
+    }
+
     const Uint8* state = SDL_GetKeyboardState(NULL);
     bool isPressed = state[SDL_SCANCODE_SPACE];
-    // std::cout << "state is" << state << std::endl;
-    if (state[SDL_SCANCODE_SPACE] && !wasPressed) {
-      std::cout << "Bullet time" << std::endl;
-      auto& bullet(Game::manager.addEntity());
-      std::cout << &bullet << std::endl;
+
+    if (isPressed && !wasPressed) {
+      std::cout << "Bullet fired!" << std::endl;
+      auto& bullet = Game::manager.addEntity();
       bullet.addGroup(Game::groupLabels::groupEnemies);
       bullet.addComponent<BulletComponent>();
-      bullet.getComponent<TransformComponent>().setPosition(
-          entity->getComponent<TransformComponent>().position.x,
-          entity->getComponent<TransformComponent>().position.y);
+      auto& bulletTransform = bullet.getComponent<TransformComponent>();
+      bulletTransform.setPosition(transform.position.x, transform.position.y);
     }
 
     wasPressed = isPressed;
   }
 
   void draw() override {
-    // Custom draw logic for CustomScript
-    // std::cout << "CustomScript drawn!" << std::endl;
+    // Drawing logic, if needed
   }
 };
