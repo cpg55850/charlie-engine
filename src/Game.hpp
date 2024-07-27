@@ -4,7 +4,7 @@ and may not be redistributed without written permission.*/
 
 // Using SDL, SDL_image, SDL_ttf, standard IO, strings, and string streams
 #include <SDL.h>
-// #include <SDL_image.h>
+// #include <SDL_image.hpp>
 // #include <SDL_ttf.h>
 #include <SDL_image.h>
 #include <stdio.h>
@@ -12,8 +12,8 @@ and may not be redistributed without written permission.*/
 #include <iostream>
 #include <vector>
 
-#include "Camera.h"
-#include "ECS/ECS.h"
+#include "Camera.hpp"
+#include "ECS/ECS.hpp"
 
 class ColliderComponent;
 

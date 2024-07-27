@@ -1,4 +1,4 @@
-#include "Map.h"
+#include "Map.hpp"
 
 #include <stdio.h>
 
@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "Game.h"
+#include "Game.hpp"
 
 Map::Map() {}
 

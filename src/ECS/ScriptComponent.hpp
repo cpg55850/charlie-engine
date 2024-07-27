@@ -1,9 +1,9 @@
 #pragma once
 #include <iostream>
 
-#include "../Game.h"
-#include "Animation.h"
-#include "Components.h"
+#include "../Game.hpp"
+#include "Animation.hpp"
+#include "Components.hpp"
 
 class ScriptComponent : public Component {
  public:

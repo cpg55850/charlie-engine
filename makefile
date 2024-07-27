@@ -1,3 +1,4 @@
+# clear && make && ./game
 # Define compiler and flags
 # Specifies the C++ compiler.
 CXX = g++

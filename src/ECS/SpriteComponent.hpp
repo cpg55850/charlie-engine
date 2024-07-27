@@ -2,9 +2,9 @@
 
 #include <map>
 
-#include "../TextureManager.h"
-#include "Animation.h"
-#include "Components.h"
+#include "../TextureManager.hpp"
+#include "Animation.hpp"
+#include "Components.hpp"
 #include "SDL.h"
 class SpriteComponent : public Component {
  private:

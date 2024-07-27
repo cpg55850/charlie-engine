@@ -2,10 +2,10 @@
 
 #include <stdio.h>
 
-#include "ECS.h"
+#include "ECS.hpp"
 #include "SDL.h"
-#include "SpriteComponent.h"
-#include "TransformComponent.h"
+#include "SpriteComponent.hpp"
+#include "TransformComponent.hpp"
 
 class TileComponent : public Component {
  public:

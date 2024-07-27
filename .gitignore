@@ -1,4 +1,5 @@
 .vscode
 game
+game.dSYM
 
-# wc -l src/**/*.cpp src/**/*.h
+# wc -l src/**/*.cpp src/**/*.hpp

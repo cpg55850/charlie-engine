@@ -1,13 +1,13 @@
-#include "Game.h"
+#include "Game.hpp"
 
-#include "Camera.h"
-#include "Collision.h"
-#include "ECS/Animation.h"
-#include "ECS/Components.h"
-#include "Map.h"
-#include "TextureManager.h"
-#include "Vector2D.h"
-#include "scripts/ScriptComponents.h"
+#include "Camera.hpp"
+#include "Collision.hpp"
+#include "ECS/Animation.hpp"
+#include "ECS/Components.hpp"
+#include "Map.hpp"
+#include "TextureManager.hpp"
+#include "Vector2D.hpp"
+#include "scripts/ScriptComponents.hpp"
 
 Map* map;
 

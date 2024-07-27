@@ -5,9 +5,9 @@
 #include <random>
 #include <string>
 
-#include "../ECS/Animation.h"
-#include "../ECS/Components.h"
-#include "../Game.h"
+#include "../ECS/Animation.hpp"
+#include "../ECS/Components.hpp"
+#include "../Game.hpp"
 
 class BulletComponent : public Component {
  public:

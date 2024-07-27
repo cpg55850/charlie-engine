@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-#include "../ECS/Animation.h"
-#include "../ECS/Components.h"
-#include "../Game.h"
+#include "../ECS/Animation.hpp"
+#include "../ECS/Components.hpp"
+#include "../Game.hpp"
 
 class PlayerComponent : public Component {
  public:

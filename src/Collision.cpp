@@ -1,8 +1,8 @@
-#include "Collision.h"
+#include "Collision.hpp"
 
 #include <iostream>
 
-#include "ECS/ColliderComponent.h"
+#include "ECS/ColliderComponent.hpp"
 
 bool Collision::AABB(const SDL_Rect& recA, const SDL_Rect& recB) {
   // std::cout << "recA is " << &recA << std::endl;

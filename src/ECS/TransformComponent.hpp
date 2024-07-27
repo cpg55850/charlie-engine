@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 
-#include "../Vector2D.h"
-#include "Components.h"
+#include "../Vector2D.hpp"
+#include "Components.hpp"
 
 // Position, rotation and scale
 class TransformComponent : public Component {

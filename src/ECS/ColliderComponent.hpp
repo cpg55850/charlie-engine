@@ -4,8 +4,8 @@
 
 #include <string>
 
-#include "Components.h"
-#include "ECS.h"
+#include "Components.hpp"
+#include "ECS.hpp"
 
 class ColliderComponent : public Component {
  public:
