@@ -5,8 +5,10 @@
 #include "ECS/Animation.hpp"
 #include "ECS/Components.hpp"
 #include "Map.hpp"
+#include "SceneFactory.hpp"
 #include "TextureManager.hpp"
 #include "Vector2D.hpp"
+#include "scenes/MainMenu.hpp"
 #include "scripts/ScriptComponents.hpp"
 
 Map* map;
@@ -19,16 +21,8 @@ Camera Game::camera = Camera(0, 0, 1920, 1080, 2000, 2000);
 Manager Game::manager = Manager();
 AudioManager Game::audioManager;
 
-auto& player(Game::manager.addEntity());
-auto& wall(Game::manager.addEntity());
-auto& bullet(Game::manager.addEntity());
-auto& bullet2(Game::manager.addEntity());
-
 const char* mapfile = "assets/tiles.png";
-
-auto& tiles(Game::manager.getGroup(Game::groupMap));
-auto& players(Game::manager.getGroup(Game::groupPlayers));
-auto& enemies(Game::manager.getGroup(Game::groupEnemies));
+bool Game::isRunning = true;
 
 // auto& tile0(manager.addEntity());
 // auto& tile1(manager.addEntity());
@@ -63,31 +57,26 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
       SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
       // std::cout << "Renderer created!" << std::endl;
 
-      isRunning = true;
+      Game::isRunning = true;
     }
   } else {
-    isRunning = false;
+    Game::isRunning = false;
   }
 
+  // if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+  //   std::cerr << "SDL_mixer could not initialize! Mix_Error: " <<
+  //   Mix_GetError()
+  //             << std::endl;
+  //   return;
+  // }
+
+  SceneFactory::instance().registerScene(
+      "MainMenu", []() { return std::make_unique<MainMenu>(); });
+
+  // Initialize SceneManager and load initial scene
+  sceneManager.loadScene("MainMenu");
+  sceneManager.switchScene("MainMenu");
   // map = new Map();
-
-  const Uint8* state = SDL_GetKeyboardState(NULL);
-  // std::cout << "state is" << state << std::endl;
-  if (state[SDL_SCANCODE_ESCAPE]) {
-    isRunning = false;
-  }
-
-  Map::LoadMap("assets/WHAT.csv", 4, 4);
-  audioManager.loadAudio("assets/laserShoot.wav", "laser");
-
-  player.addGroup(groupPlayers);
-  wall.addGroup(groupMap);
-  bullet.addGroup(groupEnemies);
-  bullet2.addGroup(groupEnemies);
-
-  player.addComponent<PlayerComponent>();
-  // bullet.addComponent<BulletComponent>();
-  bullet2.addComponent<BulletComponent>();
 }
 
 void Game::handleEvents() {
@@ -101,29 +90,24 @@ void Game::handleEvents() {
   }
 }
 void Game::update() {
-  manager.refresh();
+  // manager.refresh();
   manager.update();
-
-  camera.update(player.getComponent<TransformComponent>().position.x,
-                player.getComponent<TransformComponent>().position.y, 16, 16);
-
-  for (auto cc : colliders) {
-    Collision::AABB(player.getComponent<ColliderComponent>(), *cc);
-  }
+  sceneManager.update();  // Update the current scene
 }
 
 void Game::render() {
   SDL_RenderClear(renderer);
+  sceneManager.draw();  // Draw the current scene
 
-  for (auto& t : tiles) {
-    t->draw();
-  }
-  for (auto& p : players) {
-    p->draw();
-  }
-  for (auto& e : enemies) {
-    e->draw();
-  }
+  // for (auto& t : tiles) {
+  //   t->draw();
+  // }
+  // for (auto& p : players) {
+  //   p->draw();
+  // }
+  // for (auto& e : enemies) {
+  //   e->draw();
+  // }
 
   SDL_RenderPresent(renderer);
 }

@@ -1,9 +1,11 @@
-#pragma once
+#ifndef AUDIOMANAGER_HPP
+#define AUDIOMANAGER_HPP
 
 #include <SDL.h>
 #include <SDL_mixer.h>
 
-#include <string>
+#include <iostream>
+#include <memory>
 #include <unordered_map>
 
 class AudioManager {
@@ -18,5 +20,9 @@ class AudioManager {
   void applyEffect(const std::string& key, int effectType);
 
  private:
-  std::unordered_map<std::string, Mix_Chunk*> sounds;
+  std::unordered_map<std::string,
+                     std::unique_ptr<Mix_Chunk, decltype(&Mix_FreeChunk)>>
+      sounds;
 };
+
+#endif  // AUDIOMANAGER_HPP

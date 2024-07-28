@@ -15,6 +15,7 @@ and may not be redistributed without written permission.*/
 #include "AudioManager.hpp"
 #include "Camera.hpp"
 #include "ECS/ECS.hpp"
+#include "SceneManager.hpp"  // Include the SceneManager header
 
 class ColliderComponent;
 
@@ -43,6 +44,7 @@ class Game {
   static SDL_Event event;
   static std::vector<ColliderComponent *> colliders;
   static Camera camera;
+  static bool isRunning;
   enum groupLabels : std::size_t {
     groupMap,
     groupPlayers,
@@ -52,6 +54,6 @@ class Game {
 
  private:
   int count = 0;
-  bool isRunning;
   SDL_Window *window;
+  SceneManager sceneManager;  // Add a SceneManager member
 };
