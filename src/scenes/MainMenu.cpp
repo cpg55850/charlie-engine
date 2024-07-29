@@ -7,9 +7,9 @@
 #include "../scripts/ScriptComponents.hpp"
 
 auto& player(Game::manager.addEntity());
-auto& wall(Game::manager.addEntity());
 auto& bullet(Game::manager.addEntity());
 auto& bullet2(Game::manager.addEntity());
+auto& wall(Game::manager.addEntity());
 
 auto& tiles(Game::manager.getGroup(Game::groupMap));
 auto& players(Game::manager.getGroup(Game::groupPlayers));
@@ -34,7 +34,7 @@ void MainMenu::onEnter() {
   // }
 
   Map::LoadMap("assets/WHAT.csv", 4, 4);
-  Game::audioManager.loadAudio("assets/laserShoot.wav", "laser");
+  // Game::audioManager.loadAudio("assets/laserShoot.wav", "laser");
 
   player.addGroup(Game::groupPlayers);
   wall.addGroup(Game::groupMap);
@@ -44,6 +44,7 @@ void MainMenu::onEnter() {
   player.addComponent<PlayerComponent>();
   // bullet.addComponent<BulletComponent>();
   bullet2.addComponent<BulletComponent>();
+  wall.addComponent<WallComponent>();
 
   // Load textures, create entities, set up components, etc.
   // Example:
@@ -57,7 +58,7 @@ void MainMenu::onEnter() {
 }
 
 void MainMenu::onExit() {
-  std::cout << "Unloading MainMenu scene" << std::endl;
+  // std::cout << "Unloading MainMenu scene" << std::endl;
 
   // Clean up resources
   // Game::manager.clean();  // Optionally clean up entities
@@ -66,7 +67,7 @@ void MainMenu::onExit() {
 void MainMenu::update() {
   // Update entities, handle input, etc.
   // Game::manager.update();
-  std::cout << "updating MainMenu scene" << std::endl;
+  // std::cout << "updating MainMenu scene" << std::endl;
 
   Game::camera.update(player.getComponent<TransformComponent>().position.x,
                       player.getComponent<TransformComponent>().position.y, 16,
@@ -85,7 +86,7 @@ void MainMenu::update() {
 void MainMenu::draw() {
   // Render entities and other scene elements
   // Game::manager.render();
-  std::cout << "Draw the scene" << std::endl;
+  // std::cout << "Draw the scene" << std::endl;
 
   for (auto& t : tiles) {
     t->draw();
