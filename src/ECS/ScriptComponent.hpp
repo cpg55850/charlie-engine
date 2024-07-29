@@ -18,13 +18,13 @@ class ScriptComponent : public Component {
     // true); "assets/walk-right.png", true, Animation(0, 2, 100), "Walk"
     entity->addComponent<AnimatedSpriteComponent>();
     entity->getComponent<AnimatedSpriteComponent>().addTex(
-        "assets/walk-right.png", true, Animation(0, 2, 100), "WalkX");
+        "assets/walk-right.png", Animation(0, 2, 100));
     entity->getComponent<AnimatedSpriteComponent>().addTex(
-        "assets/walk-up.png", true, Animation(0, 2, 100), "WalkUp");
+        "assets/walk-up.png", Animation(0, 2, 100));
     entity->getComponent<AnimatedSpriteComponent>().addTex(
-        "assets/walk-down.png", true, Animation(0, 2, 100), "WalkDown");
+        "assets/walk-down.png", Animation(0, 2, 100));
     entity->getComponent<AnimatedSpriteComponent>().playTex(
-        "assets/walk-right.png", "WalkX");
+        "assets/walk-right.png");
     entity->addComponent<ColliderComponent>("player");
   }
 
@@ -38,21 +38,21 @@ class ScriptComponent : public Component {
     if (xAxis > 0) {
       std::cout << "Going right" << std::endl;
       entity->getComponent<AnimatedSpriteComponent>().playTex(
-          "assets/walk-right.png", "WalkX");
+          "assets/walk-right.png");
     } else if (xAxis < 0) {
       std::cout << "Going left" << std::endl;
       entity->getComponent<AnimatedSpriteComponent>().playTex(
-          "assets/walk-right.png", "WalkX");
+          "assets/walk-right.png");
     };
 
     if (yAxis < 0) {
       std::cout << "Going up" << std::endl;
       entity->getComponent<AnimatedSpriteComponent>().playTex(
-          "assets/walk-up.png", "WalkUp");
+          "assets/walk-up.png");
     } else if (yAxis > 0) {
       std::cout << "Going down" << std::endl;
       entity->getComponent<AnimatedSpriteComponent>().playTex(
-          "assets/walk-down.png", "WalkDown");
+          "assets/walk-down.png");
     };
   }
 

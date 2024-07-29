@@ -29,12 +29,10 @@ class PlayerComponent : public Component {
 
     if (!entity->hasComponent<AnimatedSpriteComponent>()) {
       auto& sprite = entity->addComponent<AnimatedSpriteComponent>();
-      sprite.addTex("assets/walk-right.png", true, Animation(0, 2, 100),
-                    "WalkX");
-      sprite.addTex("assets/walk-up.png", true, Animation(0, 2, 100), "WalkUp");
-      sprite.addTex("assets/walk-down.png", true, Animation(0, 2, 100),
-                    "WalkDown");
-      sprite.playTex("assets/walk-right.png", "WalkX");
+      sprite.addTex("assets/walk-right.png", Animation(0, 2, 100));
+      sprite.addTex("assets/walk-up.png", Animation(0, 2, 100));
+      sprite.addTex("assets/walk-down.png", Animation(0, 2, 100));
+      sprite.playTex("assets/walk-right.png");
     }
 
     entity->addComponent<ColliderComponent>("player");
@@ -158,25 +156,25 @@ class PlayerComponent : public Component {
     if (Game::inputManager.isPressed("MoveRight")) {
       dx = speed;
       sprite.spriteFlip = SDL_FLIP_NONE;
-      sprite.playTex("assets/walk-right.png", "WalkX");
+      sprite.playTex("assets/walk-right.png");
       currentDirection = RIGHT;
     }
     if (Game::inputManager.isPressed("MoveLeft")) {
       dx = -speed;
       sprite.spriteFlip = SDL_FLIP_HORIZONTAL;
-      sprite.playTex("assets/walk-right.png", "WalkX");
+      sprite.playTex("assets/walk-right.png");
       currentDirection = LEFT;
     }
     if (Game::inputManager.isPressed("MoveUp")) {
       dy = -speed;
       sprite.spriteFlip = SDL_FLIP_NONE;
-      sprite.playTex("assets/walk-up.png", "WalkUp");
+      sprite.playTex("assets/walk-up.png");
       currentDirection = UP;
     }
     if (Game::inputManager.isPressed("MoveDown")) {
       dy = speed;
       sprite.spriteFlip = SDL_FLIP_VERTICAL;
-      sprite.playTex("assets/walk-up.png", "WalkUp");
+      sprite.playTex("assets/walk-up.png");
       currentDirection = DOWN;
     }
 

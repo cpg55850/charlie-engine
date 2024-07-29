@@ -27,43 +27,24 @@ class AnimatedSpriteComponent : public Component {
   AnimatedSpriteComponent(const char *path) { setTex(path); }
   ~AnimatedSpriteComponent() { SDL_DestroyTexture(texture); }
 
-  AnimatedSpriteComponent(const char *path, bool _isAnimated, Animation anim,
-                          const char *animName) {
-    isAnimated = _isAnimated;
-    // Animation idle = Animation(0, 1, 100);
+  AnimatedSpriteComponent(const char *path, Animation anim) {
     // Animation walk = Animation(0, 2, 100);
 
     // animations.emplace("Idle", idle);
-    animations.emplace(animName, anim);
+    animations.emplace(path, anim);
 
-    play(animName);
+    play(path);
     setTex(path);
   }
 
   void setTex(const char *path) { texture = TextureManager::LoadTexture(path); }
 
-  void addTex(const char *path, bool _isAnimated, Animation anim,
-              const char *animName) {
-    isAnimated = _isAnimated;
-    // Animation idle = Animation(0, 1, 100);
-    // Animation walk = Animation(0, 2, 100);
-
-    // animations.emplace("Idle", idle);
-    animations.emplace(animName, anim);
-
-    // play(animName);
-    // setTex(path);
+  void addTex(const char *path, Animation anim) {
+    animations.emplace(path, anim);
   }
 
-  void playTex(const char *path, const char *animName) {
-    // isAnimated = _isAnimated;
-    // // Animation idle = Animation(0, 1, 100);
-    // // Animation walk = Animation(0, 2, 100);
-
-    // // animations.emplace("Idle", idle);
-    // animations.emplace(animName, anim);
-
-    play(animName);
+  void playTex(const char *path) {
+    play(path);
     setTex(path);
   }
 

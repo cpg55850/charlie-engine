@@ -21,8 +21,8 @@ class WallComponent : public Component {
 
     if (!entity->hasComponent<AnimatedSpriteComponent>()) {
       auto& sprite = entity->addComponent<AnimatedSpriteComponent>();
-      sprite.addTex("assets/wall.png", true, Animation(0, 1, 100), "wall");
-      sprite.playTex("assets/wall.png", "wall");
+      sprite.addTex("assets/wall.png", Animation(0, 1, 100));
+      sprite.playTex("assets/wall.png");
     }
 
     if (!entity->hasComponent<ColliderComponent>()) {
@@ -32,7 +32,7 @@ class WallComponent : public Component {
 
   void update(float deltaTime) override {
     auto& sprite = entity->getComponent<AnimatedSpriteComponent>();
-    sprite.playTex("assets/wall.png", "wall");
+    sprite.playTex("assets/wall.png");
   }
 
   void draw() override {

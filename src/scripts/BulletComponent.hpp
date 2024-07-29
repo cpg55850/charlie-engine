@@ -27,9 +27,8 @@ class BulletComponent : public Component {
     if (!entity->hasComponent<AnimatedSpriteComponent>()) {
       entity->addComponent<AnimatedSpriteComponent>();
       auto& sprite = entity->getComponent<AnimatedSpriteComponent>();
-      sprite.addTex("assets/bullet.png", true, Animation(0, 1, 100),
-                    "bulletIdle");
-      sprite.playTex("assets/bullet.png", "daf");
+      sprite.addTex("assets/bullet.png", Animation(0, 1, 100));
+      sprite.playTex("assets/bullet.png");
     }
   }
 
@@ -38,25 +37,16 @@ class BulletComponent : public Component {
       entity->destroy();
     }
 
-    // Generate randomness only if needed
-    static std::random_device rd;
-    static std::mt19937 eng(rd());
-    static std::uniform_int_distribution<> distr_int(1, 9999);
-
-    int random_int = distr_int(eng);
-    std::string str = std::to_string(random_int);
-    const char* cstr = str.c_str();
-
     // Update sprite texture animation
     auto& sprite = entity->getComponent<AnimatedSpriteComponent>();
-    sprite.playTex("assets/bullet.png", cstr);
+    sprite.playTex("assets/bullet.png");
 
     // Use SDL timing for movement calculation
-    Uint32 ticks = SDL_GetTicks();
-    double x = sin(ticks * 0.01);
+    // Uint32 ticks = SDL_GetTicks();
+    // double x = sin(ticks * 0.01);
 
-    int intX = entity->getComponent<TransformComponent>().position.x +
-               static_cast<int>(x * 10);
+    // int intX = entity->getComponent<TransformComponent>().position.x +
+    //            static_cast<int>(x * 10);
 
     // Update position
     // auto& transform = entity->getComponent<TransformComponent>();
