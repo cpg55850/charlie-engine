@@ -11,6 +11,17 @@
 #include "scenes/MainMenu.hpp"
 #include "scripts/ScriptComponents.hpp"
 
+InputManager Game::inputManager;
+
+void setupInputs() {
+  Game::inputManager.addInput("MoveRight",
+                              {SDL_SCANCODE_D, SDL_SCANCODE_RIGHT});
+  Game::inputManager.addInput("MoveLeft", {SDL_SCANCODE_A, SDL_SCANCODE_LEFT});
+  Game::inputManager.addInput("MoveUp", {SDL_SCANCODE_W, SDL_SCANCODE_UP});
+  Game::inputManager.addInput("MoveDown", {SDL_SCANCODE_S, SDL_SCANCODE_DOWN});
+  Game::inputManager.addInput("Shoot", {SDL_SCANCODE_SPACE});
+}
+
 Map* map;
 
 SDL_Renderer* Game::renderer = nullptr;
@@ -63,6 +74,8 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     Game::isRunning = false;
   }
 
+  setupInputs();
+
   // if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
   //   std::cerr << "SDL_mixer could not initialize! Mix_Error: " <<
   //   Mix_GetError()
@@ -91,6 +104,7 @@ void Game::handleEvents() {
 }
 void Game::update(float deltaTime) {
   // manager.refresh();
+  Game::inputManager.update();
   manager.update(deltaTime);
   sceneManager.update(deltaTime);  // Update the current scene
 }

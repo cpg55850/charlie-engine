@@ -15,6 +15,7 @@ and may not be redistributed without written permission.*/
 #include "AudioManager.hpp"
 #include "Camera.hpp"
 #include "ECS/ECS.hpp"
+#include "InputManager.hpp"
 #include "SceneManager.hpp"  // Include the SceneManager header
 
 class ColliderComponent;
@@ -39,6 +40,7 @@ class Game {
 
   static Manager manager;
   static AudioManager audioManager;
+  static InputManager inputManager;
   static void AddTile(int srcX, int srcY, int xPos, int yPos);
   static SDL_Renderer *renderer;
   static SDL_Event event;

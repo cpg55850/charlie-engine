@@ -10,8 +10,13 @@
 #include "../Game.hpp"
 
 class BulletComponent : public Component {
+ private:
+  Uint32 creationTime;
+  Uint32 lifespan = 1000;  // 1 second in milliseconds
+
  public:
   void init() override {
+    creationTime = SDL_GetTicks();
     std::cout << "Hi from bullet" << std::endl;
 
     // Ensure the TransformComponent and SpriteComponent are added only once
@@ -28,6 +33,10 @@ class BulletComponent : public Component {
   }
 
   void update(float deltaTime) override {
+    if (SDL_GetTicks() - creationTime > lifespan) {
+      entity->destroy();
+    }
+
     // Generate randomness only if needed
     static std::random_device rd;
     static std::mt19937 eng(rd());
@@ -49,8 +58,8 @@ class BulletComponent : public Component {
                static_cast<int>(x * 10);
 
     // Update position
-    auto& transform = entity->getComponent<TransformComponent>();
-    transform.setPosition(intX, transform.position.y);
+    // auto& transform = entity->getComponent<TransformComponent>();
+    // transform.setPosition(intX, transform.position.y);
   }
 
   void draw() override {

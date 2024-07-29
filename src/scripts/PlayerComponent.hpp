@@ -5,14 +5,18 @@
 #include "../ECS/Animation.hpp"
 #include "../ECS/Components.hpp"
 #include "../Game.hpp"
+#include "../scripts/ScriptComponents.hpp"
 
 class PlayerComponent : public Component {
  public:
+  enum Direction { UP, DOWN, LEFT, RIGHT };
+  Direction currentDirection;
   bool hitSomething = false;
   bool collisionDetected = false;
   float speed = 10.0f;
   float dx = 0.0f;
   float dy = 0.0f;
+  float bulletSpeed = 15.0f;
 
   void init() override {
     std::cout << "PlayerComponent initialized!" << std::endl;
@@ -37,6 +41,35 @@ class PlayerComponent : public Component {
   }
 
   void update(float deltaTime) override {
+    // Check if the "Space" key is pressed to shoot a bullet
+    if (Game::inputManager.isJustPressed("Shoot")) {
+      auto& transform = entity->getComponent<TransformComponent>();
+      auto& bullet(Game::manager.addEntity());
+      bullet.addComponent<TransformComponent>(transform.position.x,
+                                              transform.position.y, 32, 32, 1);
+      bullet.addComponent<BulletComponent>();
+
+      // Set bullet velocity based on player direction
+      auto& bulletTransform = bullet.getComponent<TransformComponent>();
+      switch (currentDirection) {
+        case UP:
+          bulletTransform.velocity.y = -1 * bulletSpeed;
+          break;
+        case DOWN:
+          bulletTransform.velocity.y = 1 * bulletSpeed;
+          break;
+        case LEFT:
+          bulletTransform.velocity.x = -1 * bulletSpeed;
+          break;
+        case RIGHT:
+          bulletTransform.velocity.x = 1 * bulletSpeed;
+          break;
+      }
+
+      // Add the bullet to the enemies group
+      bullet.addGroup(Game::groupEnemies);
+    }
+
     // Store the original position
     auto& transform = entity->getComponent<TransformComponent>();
     float originalX = transform.position.x;
@@ -117,24 +150,34 @@ class PlayerComponent : public Component {
 
     sprite.play("Idle");
 
-    const Uint8* mState = SDL_GetKeyboardState(NULL);
-    std::cout << "got to here" << std::endl;
+    // const Uint8* mState = SDL_GetKeyboardState(NULL);
+    // std::cout << "got to here" << std::endl;
     dx = 0;
     dy = 0;
 
-    if (mState[SDL_SCANCODE_D] || mState[SDL_SCANCODE_RIGHT]) {
+    if (Game::inputManager.isPressed("MoveRight")) {
       dx = speed;
       sprite.spriteFlip = SDL_FLIP_NONE;
+      sprite.playTex("assets/walk-right.png", "WalkX");
+      currentDirection = RIGHT;
     }
-    if (mState[SDL_SCANCODE_A] || mState[SDL_SCANCODE_LEFT]) {
+    if (Game::inputManager.isPressed("MoveLeft")) {
       dx = -speed;
       sprite.spriteFlip = SDL_FLIP_HORIZONTAL;
+      sprite.playTex("assets/walk-right.png", "WalkX");
+      currentDirection = LEFT;
     }
-    if (mState[SDL_SCANCODE_W] || mState[SDL_SCANCODE_UP]) {
+    if (Game::inputManager.isPressed("MoveUp")) {
       dy = -speed;
+      sprite.spriteFlip = SDL_FLIP_NONE;
+      sprite.playTex("assets/walk-up.png", "WalkUp");
+      currentDirection = UP;
     }
-    if (mState[SDL_SCANCODE_S] || mState[SDL_SCANCODE_DOWN]) {
+    if (Game::inputManager.isPressed("MoveDown")) {
       dy = speed;
+      sprite.spriteFlip = SDL_FLIP_VERTICAL;
+      sprite.playTex("assets/walk-up.png", "WalkUp");
+      currentDirection = DOWN;
     }
 
     // if (collisionDetected) {
