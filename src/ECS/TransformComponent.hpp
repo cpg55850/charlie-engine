@@ -15,8 +15,6 @@ class TransformComponent : public Component {
   int width = 16;
   int scale = 1;
 
-  int speed = 3;
-
   TransformComponent() { position.Zero(); }
 
   TransformComponent(int sc) {
@@ -50,8 +48,8 @@ class TransformComponent : public Component {
   }
 
   void update(float deltaTime) override {
-    position.x += velocity.x;
-    position.y += velocity.y;
+    // position.x += velocity.x * deltaTime;
+    // position.y += velocity.y * deltaTime;
     // std::cout << "Velocity: " << velocity.x << ", " << velocity.y <<
     // std::endl;
   }

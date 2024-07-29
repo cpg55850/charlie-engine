@@ -9,6 +9,7 @@
 class PlayerComponent : public Component {
  public:
   bool hitSomething = false;
+  bool collisionDetected = false;
   float speed = 10.0f;
   float dx = 0.0f;
   float dy = 0.0f;
@@ -36,30 +37,74 @@ class PlayerComponent : public Component {
   }
 
   void update(float deltaTime) override {
-    hitSomething = false;
+    // Store the original position
+    auto& transform = entity->getComponent<TransformComponent>();
+    float originalX = transform.position.x;
+    float originalY = transform.position.y;
 
-    movePlayer(deltaTime);
+    movePlayer(deltaTime, collisionDetected);
 
-    std::cout << dx << " " << dy << " " << deltaTime << std::endl;
+    // Calculate the new position
+    float newX = transform.position.x + dx * deltaTime;
+    float newY = transform.position.y + dy * deltaTime;
 
+    // Create a temporary collider with the new position
+    SDL_Rect tempCollider = {static_cast<int>(newX), static_cast<int>(newY),
+                             transform.width * transform.scale,
+                             transform.height * transform.scale};
+
+    // Check collisions with all walls
     for (auto cc : Game::colliders) {
-      if (Collision::AABB(entity->getComponent<ColliderComponent>(), *cc) &&
-          cc->tag == "wall") {
-        // resolveCollision(entity->getComponent<TransformComponent>(),
-        //                  entity->getComponent<ColliderComponent>().collider,
-        //                  cc->collider, deltaTime);
-
-        hitSomething = true;
+      if (cc->tag == "wall" && Collision::AABB(tempCollider, cc->collider)) {
+        collisionDetected = true;
+        std::cout << dx << " " << dy << std::endl;
+        std::cout << "Hit something!" << std::endl;
+        break;  // Exit the loop if a collision is detected
+      } else {
+        collisionDetected = false;
       }
     }
 
-    if (!hitSomething) {
-      // If no collision, update position normally
-      entity->getComponent<TransformComponent>().position.x += dx * deltaTime;
-      entity->getComponent<TransformComponent>().position.y += dy * deltaTime;
+    // Move the player as close to the wall as possible without colliding
+    if (collisionDetected) {
+      // Step size for incremental movement
+      float stepSize = 0.1f;
+
+      // Move incrementally until just before collision
+      while (true) {
+        // Calculate the next incremental position
+        float nextX = transform.position.x + (dx * stepSize);
+        float nextY = transform.position.y + (dy * stepSize);
+
+        // Create a temporary collider with the next incremental position
+        SDL_Rect nextTempCollider = {static_cast<int>(nextX),
+                                     static_cast<int>(nextY),
+                                     transform.width * transform.scale,
+                                     transform.height * transform.scale};
+
+        // Check for collision at the next incremental position
+        bool willCollide = false;
+        for (auto cc : Game::colliders) {
+          if (cc->tag == "wall" &&
+              Collision::AABB(nextTempCollider, cc->collider)) {
+            willCollide = true;
+            break;
+          }
+        }
+
+        // If a collision will occur, stop moving
+        if (willCollide) {
+          break;
+        }
+
+        // Update the position to the next incremental position
+        transform.position.x = nextX;
+        transform.position.y = nextY;
+      }
     } else {
-      entity->getComponent<TransformComponent>().position.x -= dx * deltaTime;
-      entity->getComponent<TransformComponent>().position.y -= dy * deltaTime;
+      // Update the position only if no collision is detected
+      transform.position.x = newX;
+      transform.position.y = newY;
     }
   }
 
@@ -67,13 +112,13 @@ class PlayerComponent : public Component {
     // Drawing logic, if needed
   }
 
-  void movePlayer(float deltaTime) {
+  void movePlayer(float deltaTime, bool collisionDetected) {
     auto& sprite = entity->getComponent<SpriteComponent>();
 
     sprite.play("Idle");
 
     const Uint8* mState = SDL_GetKeyboardState(NULL);
-
+    std::cout << "got to here" << std::endl;
     dx = 0;
     dy = 0;
 
@@ -91,35 +136,11 @@ class PlayerComponent : public Component {
     if (mState[SDL_SCANCODE_S] || mState[SDL_SCANCODE_DOWN]) {
       dy = speed;
     }
-  }
 
-  void resolveCollision(TransformComponent& transform,
-                        const SDL_Rect& playerCollider,
-                        const SDL_Rect& wallCollider, float deltaTime) {
-    // Calculate the overlap on each axis
-    int overlapX = (playerCollider.x + playerCollider.w / 2) -
-                   (wallCollider.x + wallCollider.w / 2);
-    int overlapY = (playerCollider.y + playerCollider.h / 2) -
-                   (wallCollider.y + wallCollider.h / 2);
-
-    // Determine the smallest overlap
-    if (std::abs(overlapX) < std::abs(overlapY)) {
-      // Resolve collision on the X axis
-      if (overlapX > 0) {
-        transform.position.x = wallCollider.x + wallCollider.w;
-      } else {
-        transform.position.x = wallCollider.x - playerCollider.w;
-      }
-      // transform.velocity.x = 0;  // Stop horizontal movement
-    } else {
-      // Resolve collision on the Y axis
-      if (overlapY > 0) {
-        transform.position.y = wallCollider.y + wallCollider.h;
-      } else {
-        transform.position.y = wallCollider.y - playerCollider.h;
-      }
-      // transform.velocity.y = 0;  // Stop vertical movement
-    }
+    // if (collisionDetected) {
+    //   dx = -dx;
+    //   dy = -dy;
+    // }
   }
 
  private:
