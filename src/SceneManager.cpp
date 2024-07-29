@@ -30,9 +30,9 @@ void SceneManager::switchScene(const std::string& sceneName) {
   }
 }
 
-void SceneManager::update() {
+void SceneManager::update(float deltaTime) {
   if (currentScene) {
-    currentScene->update();
+    currentScene->update(deltaTime);
   }
 }
 

@@ -23,7 +23,7 @@ class KeyboardController : public Component {
     sprite = &entity->getComponent<SpriteComponent>();
   }
 
-  void update() override {
+  void update(float deltaTime) override {
     hSpeed = 0;
     vSpeed = 0;
 

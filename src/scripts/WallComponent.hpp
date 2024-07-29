@@ -30,7 +30,7 @@ class WallComponent : public Component {
     }
   }
 
-  void update() override {
+  void update(float deltaTime) override {
     auto& sprite = entity->getComponent<SpriteComponent>();
     sprite.playTex("assets/wall.png", "wall");
   }

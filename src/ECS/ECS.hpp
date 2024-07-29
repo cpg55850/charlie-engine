@@ -35,7 +35,7 @@ class Component {
  public:
   Entity* entity;
   virtual void init() {}
-  virtual void update() {}
+  virtual void update(float deltaTime) {}
   virtual void draw() {}
   virtual ~Component() {}
 };
@@ -47,10 +47,10 @@ class Entity {
     componentBitSet.reset();       // Reset componentBitSet
   }
 
-  void update() {
+  void update(float deltaTime) {
     if (!active) return;  // Ensure the entity is active
     for (auto& c : components) {
-      if (c) c->update();
+      if (c) c->update(deltaTime);
     }
   }
 
@@ -104,9 +104,9 @@ class Entity {
 
 class Manager {
  public:
-  void update() {
+  void update(float deltaTime) {
     for (auto& e : entities) {
-      if (e) e->update();
+      if (e) e->update(deltaTime);
     }
   }
 

@@ -7,7 +7,7 @@ class Scene {
   Scene(const std::string& name);
   virtual ~Scene() = default;
 
-  virtual void update() {}
+  virtual void update(float deltaTime) {}
   virtual void draw() {}
   virtual void onEnter() {}
   virtual void onExit() {}

@@ -8,9 +8,10 @@
 
 class PlayerComponent : public Component {
  public:
-  bool wasPressed = false;
-  float hSpeed = 0.0f;
-  float vSpeed = 0.0f;
+  bool hitSomething = false;
+  float speed = 10.0f;
+  float dx = 0.0f;
+  float dy = 0.0f;
 
   void init() override {
     std::cout << "PlayerComponent initialized!" << std::endl;
@@ -34,55 +35,31 @@ class PlayerComponent : public Component {
     entity->addComponent<ColliderComponent>("player");
   }
 
-  void update() override {
-    hSpeed = 0.0f;
-    vSpeed = 0.0f;
-    auto& transform = entity->getComponent<TransformComponent>();
-    auto& sprite = entity->getComponent<SpriteComponent>();
+  void update(float deltaTime) override {
+    hitSomething = false;
 
-    int xAxis = transform.velocity.x;
-    int yAxis = transform.velocity.y;
+    movePlayer(deltaTime);
 
-    if (xAxis != 0) {
-      sprite.playTex("assets/walk-right.png", "WalkX");
-    }
-
-    if (yAxis != 0) {
-      sprite.playTex(yAxis < 0 ? "assets/walk-up.png" : "assets/walk-down.png",
-                     yAxis < 0 ? "WalkUp" : "WalkDown");
-    }
-
-    const Uint8* state = SDL_GetKeyboardState(NULL);
-    bool isPressed = state[SDL_SCANCODE_SPACE];
-
-    if (isPressed && !wasPressed) {
-      std::cout << "Bullet fired!" << std::endl;
-      auto& bullet = Game::manager.addEntity();
-      bullet.addGroup(Game::groupLabels::groupEnemies);
-      bullet.addComponent<BulletComponent>();
-      auto& bulletTransform = bullet.getComponent<TransformComponent>();
-      bulletTransform.setPosition(transform.position.x, transform.position.y);
-      // Game::audioManager.playAudio("laser", 0, -1);
-    }
-
-    wasPressed = isPressed;
-
-    bool hitSomething = false;
+    std::cout << dx << " " << dy << " " << deltaTime << std::endl;
 
     for (auto cc : Game::colliders) {
       if (Collision::AABB(entity->getComponent<ColliderComponent>(), *cc) &&
           cc->tag == "wall") {
-        hitSomething = true;
-        transform.velocity.x = 0.0f;
-        transform.velocity.y = 0.0f;
-        // resolveCollision(transform,
+        // resolveCollision(entity->getComponent<TransformComponent>(),
         //                  entity->getComponent<ColliderComponent>().collider,
-        //                  cc->collider);
+        //                  cc->collider, deltaTime);
+
+        hitSomething = true;
       }
     }
 
     if (!hitSomething) {
-      movePlayer();
+      // If no collision, update position normally
+      entity->getComponent<TransformComponent>().position.x += dx * deltaTime;
+      entity->getComponent<TransformComponent>().position.y += dy * deltaTime;
+    } else {
+      entity->getComponent<TransformComponent>().position.x -= dx * deltaTime;
+      entity->getComponent<TransformComponent>().position.y -= dy * deltaTime;
     }
   }
 
@@ -90,63 +67,60 @@ class PlayerComponent : public Component {
     // Drawing logic, if needed
   }
 
-  void movePlayer() {
-    auto& transform = entity->getComponent<TransformComponent>();
+  void movePlayer(float deltaTime) {
     auto& sprite = entity->getComponent<SpriteComponent>();
 
     sprite.play("Idle");
 
     const Uint8* mState = SDL_GetKeyboardState(NULL);
 
+    dx = 0;
+    dy = 0;
+
     if (mState[SDL_SCANCODE_D] || mState[SDL_SCANCODE_RIGHT]) {
-      hSpeed += 10.0f;
-      // sprite.play("Walk");
+      dx = speed;
       sprite.spriteFlip = SDL_FLIP_NONE;
     }
     if (mState[SDL_SCANCODE_A] || mState[SDL_SCANCODE_LEFT]) {
-      hSpeed -= 10.0f;
-      // sprite.play("Walk");
-      sprite.spriteFlip = SDL_FLIP_HORIZONTAL;
-    }
-    // up/down
-    if (mState[SDL_SCANCODE_S] || mState[SDL_SCANCODE_DOWN]) {
-      vSpeed += 10.0f;
-      // sprite.play("Walk");
+      dx = -speed;
       sprite.spriteFlip = SDL_FLIP_HORIZONTAL;
     }
     if (mState[SDL_SCANCODE_W] || mState[SDL_SCANCODE_UP]) {
-      vSpeed -= 10.0f;
-      // sprite.play("Walk");
-      sprite.spriteFlip = SDL_FLIP_NONE;
+      dy = -speed;
     }
-
-    transform.velocity.x = hSpeed;
-    transform.velocity.y = vSpeed;
+    if (mState[SDL_SCANCODE_S] || mState[SDL_SCANCODE_DOWN]) {
+      dy = speed;
+    }
   }
 
- private:
   void resolveCollision(TransformComponent& transform,
                         const SDL_Rect& playerCollider,
-                        const SDL_Rect& wallCollider) {
-    int deltaX = (playerCollider.x + playerCollider.w / 2) -
-                 (wallCollider.x + wallCollider.w / 2);
-    int deltaY = (playerCollider.y + playerCollider.h / 2) -
-                 (wallCollider.y + wallCollider.h / 2);
+                        const SDL_Rect& wallCollider, float deltaTime) {
+    // Calculate the overlap on each axis
+    int overlapX = (playerCollider.x + playerCollider.w / 2) -
+                   (wallCollider.x + wallCollider.w / 2);
+    int overlapY = (playerCollider.y + playerCollider.h / 2) -
+                   (wallCollider.y + wallCollider.h / 2);
 
-    if (abs(deltaX) > abs(deltaY)) {
-      if (deltaX > 0) {
+    // Determine the smallest overlap
+    if (std::abs(overlapX) < std::abs(overlapY)) {
+      // Resolve collision on the X axis
+      if (overlapX > 0) {
         transform.position.x = wallCollider.x + wallCollider.w;
       } else {
         transform.position.x = wallCollider.x - playerCollider.w;
       }
-      transform.velocity.x = 0;
+      // transform.velocity.x = 0;  // Stop horizontal movement
     } else {
-      if (deltaY > 0) {
+      // Resolve collision on the Y axis
+      if (overlapY > 0) {
         transform.position.y = wallCollider.y + wallCollider.h;
       } else {
         transform.position.y = wallCollider.y - playerCollider.h;
       }
-      transform.velocity.y = 0;
+      // transform.velocity.y = 0;  // Stop vertical movement
     }
   }
+
+ private:
 };

@@ -27,7 +27,7 @@ class BulletComponent : public Component {
     }
   }
 
-  void update() override {
+  void update(float deltaTime) override {
     // Generate randomness only if needed
     static std::random_device rd;
     static std::mt19937 eng(rd());

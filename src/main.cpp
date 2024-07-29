@@ -8,6 +8,7 @@ int main(int argc, const char *argv[]) {
 
   Uint32 frameStart;
   int frameTime;
+  float deltaTime;
 
   game = new Game();
 
@@ -17,7 +18,11 @@ int main(int argc, const char *argv[]) {
   while (game->running()) {
     frameStart = SDL_GetTicks();
     game->handleEvents();
-    game->update();
+
+    // Calculate delta time
+    deltaTime = 1 + ((SDL_GetTicks() - frameStart) / 1000.0f);
+
+    game->update(deltaTime);
     game->render();
     frameTime = SDL_GetTicks() - frameStart;
 

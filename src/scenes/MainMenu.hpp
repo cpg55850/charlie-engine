@@ -8,10 +8,10 @@ class MainMenu : public Scene {
   MainMenu();
   ~MainMenu();
 
-  void update() override;   // Update logic
-  void draw() override;     // Render the scene
-  void onEnter() override;  // Load assets, initialize entities
-  void onExit() override;   // Load assets, initialize entities
+  void update(float deltaTime) override;  // Update logic
+  void draw() override;                   // Render the scene
+  void onEnter() override;                // Load assets, initialize entities
+  void onExit() override;                 // Load assets, initialize entities
 
  private:
   // Store your entities and components

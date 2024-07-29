@@ -73,7 +73,7 @@ class SpriteComponent : public Component {
     srcRect.w = transform->width;
     srcRect.h = transform->height;
   }
-  void update() override {
+  void update(float deltaTime) override {
     if (speed == 0 || frames == 0) {
       speed = 1;
       frames = 1;

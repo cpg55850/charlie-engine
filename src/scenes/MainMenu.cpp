@@ -64,7 +64,7 @@ void MainMenu::onExit() {
   // Game::manager.clean();  // Optionally clean up entities
 }
 
-void MainMenu::update() {
+void MainMenu::update(float deltaTime) {
   // Update entities, handle input, etc.
   // Game::manager.update();
   // std::cout << "updating MainMenu scene" << std::endl;

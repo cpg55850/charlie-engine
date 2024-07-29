@@ -30,7 +30,7 @@ class ScriptComponent : public Component {
     entity->addComponent<ColliderComponent>("player");
   }
 
-  void update() override {
+  void update(float deltaTime) override {
     // Custom update logic for CustomScript
     // std::cout << "CustomScript updated!" << std::endl;
     // Player Update

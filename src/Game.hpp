@@ -31,7 +31,7 @@ class Game {
             bool fullscreen);
 
   void handleEvents();
-  void update();
+  void update(float deltaTime);
   void render();
   void clean();
 

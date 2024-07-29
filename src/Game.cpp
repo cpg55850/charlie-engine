@@ -89,10 +89,10 @@ void Game::handleEvents() {
       break;
   }
 }
-void Game::update() {
+void Game::update(float deltaTime) {
   // manager.refresh();
-  manager.update();
-  sceneManager.update();  // Update the current scene
+  manager.update(deltaTime);
+  sceneManager.update(deltaTime);  // Update the current scene
 }
 
 void Game::render() {

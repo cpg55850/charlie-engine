@@ -19,7 +19,7 @@ class SceneManager {
   void switchScene(const std::string& sceneName);
 
   // Update the current scene
-  void update();
+  void update(float deltaTime);
 
   // Draw the current scene
   void draw();
