@@ -55,15 +55,7 @@ class AnimatedSpriteComponent : public Component {
     srcRect.h = transform->height;
   }
   void update(float deltaTime) override {
-    if (speed == 0 || frames == 0) {
-      speed = 1;
-      frames = 1;
-    }
-
-    if (isAnimated) {
-      srcRect.x =
-          srcRect.w * static_cast<int>((SDL_GetTicks() / speed) % frames);
-    }
+    srcRect.x = srcRect.w * static_cast<int>((SDL_GetTicks() / speed) % frames);
 
     srcRect.y = animIndex * transform->height;
 
