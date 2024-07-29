@@ -27,8 +27,8 @@ class PlayerComponent : public Component {
       entity->addComponent<TransformComponent>(600, 600, 16, 16, 4);
     }
 
-    if (!entity->hasComponent<SpriteComponent>()) {
-      auto& sprite = entity->addComponent<SpriteComponent>();
+    if (!entity->hasComponent<AnimatedSpriteComponent>()) {
+      auto& sprite = entity->addComponent<AnimatedSpriteComponent>();
       sprite.addTex("assets/walk-right.png", true, Animation(0, 2, 100),
                     "WalkX");
       sprite.addTex("assets/walk-up.png", true, Animation(0, 2, 100), "WalkUp");
@@ -146,7 +146,7 @@ class PlayerComponent : public Component {
   }
 
   void movePlayer(float deltaTime, bool collisionDetected) {
-    auto& sprite = entity->getComponent<SpriteComponent>();
+    auto& sprite = entity->getComponent<AnimatedSpriteComponent>();
 
     sprite.play("Idle");
 

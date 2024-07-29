@@ -19,13 +19,14 @@ class BulletComponent : public Component {
     creationTime = SDL_GetTicks();
     std::cout << "Hi from bullet" << std::endl;
 
-    // Ensure the TransformComponent and SpriteComponent are added only once
+    // Ensure the TransformComponent and AnimatedSpriteComponent are added only
+    // once
     if (!entity->hasComponent<TransformComponent>()) {
       entity->addComponent<TransformComponent>(8);
     }
-    if (!entity->hasComponent<SpriteComponent>()) {
-      entity->addComponent<SpriteComponent>();
-      auto& sprite = entity->getComponent<SpriteComponent>();
+    if (!entity->hasComponent<AnimatedSpriteComponent>()) {
+      entity->addComponent<AnimatedSpriteComponent>();
+      auto& sprite = entity->getComponent<AnimatedSpriteComponent>();
       sprite.addTex("assets/bullet.png", true, Animation(0, 1, 100),
                     "bulletIdle");
       sprite.playTex("assets/bullet.png", "daf");
@@ -47,7 +48,7 @@ class BulletComponent : public Component {
     const char* cstr = str.c_str();
 
     // Update sprite texture animation
-    auto& sprite = entity->getComponent<SpriteComponent>();
+    auto& sprite = entity->getComponent<AnimatedSpriteComponent>();
     sprite.playTex("assets/bullet.png", cstr);
 
     // Use SDL timing for movement calculation

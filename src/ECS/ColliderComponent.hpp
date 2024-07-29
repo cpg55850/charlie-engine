@@ -4,6 +4,7 @@
 
 #include <string>
 
+#include "../Game.hpp"  // Include the Game header
 #include "Components.hpp"
 #include "ECS.hpp"
 

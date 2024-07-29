@@ -11,6 +11,7 @@
 #include "scenes/MainMenu.hpp"
 #include "scripts/ScriptComponents.hpp"
 
+SDL_Renderer* Game::renderer = nullptr;
 InputManager Game::inputManager;
 
 void setupInputs() {
@@ -24,7 +25,6 @@ void setupInputs() {
 
 Map* map;
 
-SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
 
 Camera Game::camera = Camera(0, 0, 1920, 1080, 2000, 2000);

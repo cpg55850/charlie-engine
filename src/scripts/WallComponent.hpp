@@ -19,8 +19,8 @@ class WallComponent : public Component {
       entity->addComponent<TransformComponent>(400, 600, 16, 16, 4);
     }
 
-    if (!entity->hasComponent<SpriteComponent>()) {
-      auto& sprite = entity->addComponent<SpriteComponent>();
+    if (!entity->hasComponent<AnimatedSpriteComponent>()) {
+      auto& sprite = entity->addComponent<AnimatedSpriteComponent>();
       sprite.addTex("assets/wall.png", true, Animation(0, 1, 100), "wall");
       sprite.playTex("assets/wall.png", "wall");
     }
@@ -31,7 +31,7 @@ class WallComponent : public Component {
   }
 
   void update(float deltaTime) override {
-    auto& sprite = entity->getComponent<SpriteComponent>();
+    auto& sprite = entity->getComponent<AnimatedSpriteComponent>();
     sprite.playTex("assets/wall.png", "wall");
   }
 
