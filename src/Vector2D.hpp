@@ -27,6 +27,8 @@ class Vector2D {
 
   Vector2D& operator*(const int& i);
   Vector2D& Zero();
+  float length() const;
+  void normalize();
 
   friend std::ostream& operator<<(std::ostream& stream, const Vector2D& vec);
 };

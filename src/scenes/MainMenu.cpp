@@ -10,6 +10,7 @@ auto& player(Game::manager.addEntity());
 auto& bullet(Game::manager.addEntity());
 auto& bullet2(Game::manager.addEntity());
 auto& wall(Game::manager.addEntity());
+auto& enemy(Game::manager.addEntity());
 
 auto& tiles(Game::manager.getGroup(Game::groupMap));
 auto& players(Game::manager.getGroup(Game::groupPlayers));
@@ -40,11 +41,13 @@ void MainMenu::onEnter() {
   wall.addGroup(Game::groupMap);
   bullet.addGroup(Game::groupEnemies);
   bullet2.addGroup(Game::groupEnemies);
+  enemy.addGroup(Game::groupEnemies);
 
   player.addComponent<PlayerComponent>();
   // bullet.addComponent<BulletComponent>();
   bullet2.addComponent<BulletComponent>();
   wall.addComponent<WallComponent>();
+  enemy.addComponent<EnemyComponent>();
 
   // Load textures, create entities, set up components, etc.
   // Example:

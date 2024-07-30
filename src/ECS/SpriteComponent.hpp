@@ -9,14 +9,35 @@
 
 class SpriteComponent : public Component {
  public:
-  SpriteComponent(const char* path) { setTex(path); }
+  SpriteComponent() : transform(nullptr), texture(nullptr) {}
+
+  ~SpriteComponent() { SDL_DestroyTexture(texture); }
+
+  void init() override {
+    transform = &entity->getComponent<TransformComponent>();
+    srcRect.x = srcRect.y = 0;
+    srcRect.w = transform->width;
+    srcRect.h = transform->height;
+  }
 
   void setTex(const char* path) { texture = TextureManager::LoadTexture(path); }
 
   void draw() override {
-    // Drawing logic for the sprite
+    TextureManager::Draw(texture, srcRect, destRect, spriteFlip);
+  }
+
+  void update(float deltaTime) override {
+    transform = &entity->getComponent<TransformComponent>();
+
+    destRect.x = static_cast<int>(transform->position.x);
+    destRect.y = static_cast<int>(transform->position.y);
+    destRect.w = transform->width * transform->scale;
+    destRect.h = transform->height * transform->scale;
   }
 
  private:
+  TransformComponent* transform;
   SDL_Texture* texture;
+  SDL_Rect srcRect, destRect;
+  SDL_RendererFlip spriteFlip = SDL_FLIP_NONE;
 };
