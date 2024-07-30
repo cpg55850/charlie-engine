@@ -95,7 +95,7 @@ class Entity {
 
  private:
   Manager& manager;
-  bool active;
+  bool active = true;
   std::vector<std::unique_ptr<Component>> components;
   ComponentArray componentArray;
   ComponentBitset componentBitSet;

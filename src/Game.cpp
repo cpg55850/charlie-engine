@@ -75,6 +75,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   }
 
   setupInputs();
+  audioManager.loadAudio("assets/laserShoot.wav", "laser");
 
   // if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
   //   std::cerr << "SDL_mixer could not initialize! Mix_Error: " <<
@@ -103,7 +104,7 @@ void Game::handleEvents() {
   }
 }
 void Game::update(float deltaTime) {
-  // manager.refresh();
+  manager.refresh();
   Game::inputManager.update();
   manager.update(deltaTime);
   sceneManager.update(deltaTime);  // Update the current scene

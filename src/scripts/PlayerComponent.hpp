@@ -40,7 +40,9 @@ class PlayerComponent : public Component {
 
   void update(float deltaTime) override {
     // Check if the "Space" key is pressed to shoot a bullet
-    if (Game::inputManager.isJustPressed("Shoot")) {
+    Uint32 now = SDL_GetTicks();
+    Uint32 elapsed = now - lastShootTime;
+    if (Game::inputManager.isPressed("Shoot") && elapsed >= 100) {
       auto& transform = entity->getComponent<TransformComponent>();
       auto& bullet(Game::manager.addEntity());
       bullet.addComponent<TransformComponent>(transform.position.x,
@@ -66,6 +68,7 @@ class PlayerComponent : public Component {
 
       // Add the bullet to the enemies group
       bullet.addGroup(Game::groupEnemies);
+      lastShootTime = now;
     }
 
     // Store the original position
@@ -185,4 +188,5 @@ class PlayerComponent : public Component {
   }
 
  private:
+  Uint32 lastShootTime;
 };

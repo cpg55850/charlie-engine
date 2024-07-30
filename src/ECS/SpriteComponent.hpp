@@ -10,8 +10,8 @@
 class SpriteComponent : public Component {
  public:
   SpriteComponent() : transform(nullptr), texture(nullptr) {}
-
-  ~SpriteComponent() { SDL_DestroyTexture(texture); }
+  //  SDL_DestroyTexture(texture);
+  ~SpriteComponent() {}
 
   void init() override {
     transform = &entity->getComponent<TransformComponent>();

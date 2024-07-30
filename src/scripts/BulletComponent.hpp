@@ -12,23 +12,24 @@
 class BulletComponent : public Component {
  private:
   Uint32 creationTime;
-  Uint32 lifespan = 1000;  // 1 second in milliseconds
+  Uint32 lifespan = 5000;  // 1 second in milliseconds
 
  public:
   void init() override {
     creationTime = SDL_GetTicks();
     std::cout << "Hi from bullet" << std::endl;
 
+    Game::audioManager.playAudio("laser");
+
     // Ensure the TransformComponent and AnimatedSpriteComponent are added only
     // once
     if (!entity->hasComponent<TransformComponent>()) {
       entity->addComponent<TransformComponent>(8);
     }
-    if (!entity->hasComponent<AnimatedSpriteComponent>()) {
-      entity->addComponent<AnimatedSpriteComponent>();
-      auto& sprite = entity->getComponent<AnimatedSpriteComponent>();
-      sprite.addTex("assets/bullet.png", Animation(0, 1, 100));
-      sprite.playTex("assets/bullet.png");
+    if (!entity->hasComponent<SpriteComponent>()) {
+      entity->addComponent<SpriteComponent>();
+      auto& sprite = entity->getComponent<SpriteComponent>();
+      sprite.setTex("assets/bullet.png");
     }
   }
 
@@ -36,26 +37,11 @@ class BulletComponent : public Component {
     if (SDL_GetTicks() - creationTime > lifespan) {
       entity->destroy();
     }
-
-    // Update sprite texture animation
-    auto& sprite = entity->getComponent<AnimatedSpriteComponent>();
-    sprite.playTex("assets/bullet.png");
-
-    // Use SDL timing for movement calculation
-    // Uint32 ticks = SDL_GetTicks();
-    // double x = sin(ticks * 0.01);
-
-    // int intX = entity->getComponent<TransformComponent>().position.x +
-    //            static_cast<int>(x * 10);
-
-    // Update position
-    // auto& transform = entity->getComponent<TransformComponent>();
-    // transform.setPosition(intX, transform.position.y);
   }
 
   void draw() override {
     // Drawing logic for BulletComponent, if needed
   }
 
-  // ~BulletComponent() { std::cout << "Bye!" << std::endl; }
+  ~BulletComponent() { std::cout << "Bye!" << std::endl; }
 };

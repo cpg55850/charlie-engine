@@ -7,17 +7,18 @@ AudioManager::AudioManager() {
   //   return;
   // }
 
-  // if (Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG) == 0) {
-  //   std::cerr << "Mix_Init failed! Mix_Error: " << Mix_GetError() <<
-  //   std::endl; return;
-  // }
+  if (Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG) == 0) {
+    std::cerr << "Mix_Init failed! Mix_Error: " << Mix_GetError() << std::endl;
+    return;
+  }
 
-  // if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-  //   std::cerr << "SDL_mixer could not initialize! Mix_Error: " <<
-  //   Mix_GetError()
-  //             << std::endl;
-  //   return;
-  // }
+  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+    std::cerr << "SDL_mixer could not initialize! Mix_Error: " << Mix_GetError()
+              << std::endl;
+    return;
+  }
+
+  atexit(Mix_CloseAudio);
 }
 
 AudioManager::~AudioManager() {

@@ -25,7 +25,7 @@ class AnimatedSpriteComponent : public Component {
 
   AnimatedSpriteComponent() = default;
   AnimatedSpriteComponent(const char *path) { setTex(path); }
-  ~AnimatedSpriteComponent() { SDL_DestroyTexture(texture); }
+  ~AnimatedSpriteComponent() {}
 
   AnimatedSpriteComponent(const char *path, Animation anim) {
     // Animation walk = Animation(0, 2, 100);
