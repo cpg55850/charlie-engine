@@ -7,3 +7,5 @@
 #include "ScriptComponent.hpp"
 #include "TileComponent.hpp"
 #include "SpriteComponent.hpp"
+#include "ButtonComponent.hpp"
+#include "LabelComponent.hpp"

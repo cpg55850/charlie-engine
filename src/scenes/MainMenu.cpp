@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "../Collision.hpp"
+#include "../FontLoader.hpp"
 #include "../Map.hpp"
 #include "../scripts/ScriptComponents.hpp"
 
@@ -11,10 +12,13 @@ auto& bullet(Game::manager.addEntity());
 auto& bullet2(Game::manager.addEntity());
 auto& wall(Game::manager.addEntity());
 auto& enemy(Game::manager.addEntity());
+auto& button(Game::manager.addEntity());
+auto& label(Game::manager.addEntity());
 
 auto& tiles(Game::manager.getGroup(Game::groupMap));
 auto& players(Game::manager.getGroup(Game::groupPlayers));
 auto& enemies(Game::manager.getGroup(Game::groupEnemies));
+TTF_Font* font = nullptr;
 
 // Constructor now initializes the Scene base class with a name
 MainMenu::MainMenu() : Scene("MainMenu") {
@@ -27,6 +31,8 @@ MainMenu::~MainMenu() {
 
 void MainMenu::onEnter() {
   std::cout << "Hello from Main Menu scene" << std::endl;
+
+  font = FontLoader::loadFont("assets/fonts/zig.ttf", 24);
 
   // const Uint8* state = SDL_GetKeyboardState(NULL);
   // std::cout << "state is" << state << std::endl;
@@ -42,12 +48,28 @@ void MainMenu::onEnter() {
   bullet.addGroup(Game::groupEnemies);
   bullet2.addGroup(Game::groupEnemies);
   enemy.addGroup(Game::groupEnemies);
+  label.addGroup(Game::groupPlayers);
 
   player.addComponent<PlayerComponent>();
   // bullet.addComponent<BulletComponent>();
   bullet2.addComponent<BulletComponent>();
   wall.addComponent<WallComponent>();
   enemy.addComponent<EnemyComponent>();
+  button.addComponent<ButtonComponent>();
+  label.addComponent<LabelComponent>();
+
+  TransformComponent labelTransform;
+  labelTransform.position.x = 0;
+  labelTransform.position.y = 0;
+  labelTransform.width = 100;
+  labelTransform.height = 100;
+  labelTransform.scale = 1;
+  label.addComponent<LabelComponent>();
+  label.getComponent<LabelComponent>().setup(font, "Hello, World!",
+                                             {255, 255, 255}, &labelTransform);
+
+  // button.getComponent<ButtonComponent>().setup("assets/water.png", 100, 100,
+  //  100, 100, "Play", "Play");
 
   // Load textures, create entities, set up components, etc.
   // Example:

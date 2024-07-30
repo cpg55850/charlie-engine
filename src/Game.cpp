@@ -4,6 +4,7 @@
 #include "Collision.hpp"
 #include "ECS/Animation.hpp"
 #include "ECS/Components.hpp"
+#include "FontLoader.hpp"
 #include "Map.hpp"
 #include "SceneFactory.hpp"
 #include "TextureManager.hpp"
@@ -77,6 +78,8 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
   setupInputs();
   audioManager.loadAudio("assets/laserShoot.wav", "laser");
 
+  FontLoader::init();
+
   // if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
   //   std::cerr << "SDL_mixer could not initialize! Mix_Error: " <<
   //   Mix_GetError()
@@ -130,6 +133,7 @@ void Game::render() {
 void Game::clean() {
   SDL_DestroyWindow(window);
   SDL_DestroyRenderer(renderer);
+  FontLoader::quit();
   SDL_Quit();
   std::cout << "Game cleaned" << std::endl;
 }
