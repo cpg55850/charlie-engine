@@ -5,6 +5,7 @@
 #include "Collision.hpp"
 #include "FontLoader.hpp"
 #include "Map.hpp"
+#include "ECS/Systems.hpp"
 #include "scripts/ScriptComponents.hpp"
 
 auto& player(Game::manager.addEntity());
@@ -18,6 +19,7 @@ auto& label(Game::manager.addEntity());
 auto& tiles(Game::manager.getGroup(Game::groupMap));
 auto& players(Game::manager.getGroup(Game::groupPlayers));
 auto& enemies(Game::manager.getGroup(Game::groupEnemies));
+auto& projectiles(Game::manager.getGroup(Game::groupProjectiles));
 TTF_Font* font = nullptr;
 
 // Constructor now initializes the Scene base class with a name
@@ -34,11 +36,16 @@ void MainMenu::onEnter() {
 
   font = FontLoader::loadFont("assets/fonts/zig.ttf", 24);
 
-  // const Uint8* state = SDL_GetKeyboardState(NULL);
-  // std::cout << "state is" << state << std::endl;
-  // if (state[SDL_SCANCODE_ESCAPE]) {
-  //   Game::isRunning = false;
-  // }
+  // Initialize ECS Systems in correct order
+  // IMPORTANT: Systems must be added for the game to work!
+  Game::manager.addSystem<InputSystem>();       // 1. Updates input state
+  Game::manager.addSystem<ScriptSystem>();      // 2. Runs PlayerComponent (sets velocity, requests shoot)
+  Game::manager.addSystem<CombatSystem>();      // 3. Spawns bullets based on shoot requests
+  Game::manager.addSystem<CollisionSystem>();   // 4. Predicts & prevents collisions (modifies velocity)
+  Game::manager.addSystem<MovementSystem>();    // 5. Applies velocity to position
+  Game::manager.addSystem<LifetimeSystem>();    // 6. Destroys old/off-screen entities
+  Game::manager.addSystem<AnimationSystem>();   // 7. Updates animations based on state
+  Game::manager.addSystem<RenderSystem>();      // 8. Renders everything (must be last!)
 
   Map::LoadMap("assets/WHAT.csv", 4, 4);
   // Game::audioManager.loadAudio("assets/laserShoot.wav", "laser");
@@ -123,5 +130,8 @@ void MainMenu::draw() {
   }
   for (auto& e : enemies) {
     e->draw();
+  }
+  for (auto& proj : projectiles) {
+    proj->draw();
   }
 }

@@ -1,6 +1,12 @@
 //
 // Created by Charlie Graham on 11/23/25.
 //
+// Refactored to work with ECS Systems:
+// - InputSystem handles input state
+// - MovementSystem updates position based on velocity
+// - AnimationSystem updates sprite frames
+// - CollisionSystem detects collisions
+// - This script only sets velocity and handles game logic
 
 #include "Collision.hpp"
 #include "scripts/PlayerComponent.hpp"
@@ -8,7 +14,9 @@
 #include <iostream>
 
 #include "ECS/AnimatedSpriteComponent.hpp"
+#include "ECS/AnimationStateComponent.hpp"
 #include "ECS/ColliderComponent.hpp"
+#include "ECS/CombatComponent.hpp"
 #include "scripts/ScriptComponents.hpp"
 
 PlayerComponent::~PlayerComponent() {}
@@ -30,115 +38,40 @@ void PlayerComponent::init() {
   }
 
   entity->addComponent<ColliderComponent>("player");
+
+  // Add InputComponent for ECS-based input handling
+  entity->addComponent<InputComponent>();
+
+  // Add AnimationStateComponent for animation control
+  entity->addComponent<AnimationStateComponent>();
+
+  // Add CombatComponent for shooting
+  auto& combat = entity->addComponent<CombatComponent>();
+  combat.projectileSpeed = 400.0f;
+  combat.fireRate = 100.0f;
 }
 
 void PlayerComponent::update(float deltaTime) {
+  // 1. Handle input - sets velocity based on player input
   handleInput();
+
+  // 2. Handle shooting logic
   shootable();
-  movePlayer(deltaTime);
 
-  auto& transform = entity->getComponent<TransformComponent>();
-  transform.velocity.x = 0;
-  transform.velocity.y = 0;
-}
-
-void PlayerComponent::movePlayer(float deltaTime) {
-  auto& transform = entity->getComponent<TransformComponent>();
-
-  float newX = transform.position.x + transform.velocity.x * deltaTime;
-  float newY = transform.position.y + transform.velocity.y * deltaTime;
-
-  SDL_Rect tempCollider = {static_cast<int>(newX), static_cast<int>(newY),
-                           transform.width * transform.scale,
-                           transform.height * transform.scale};
-
-  bool collisionDetected = false;
-  for (auto cc : Game::colliders) {
-    if (cc->tag == "wall" && Collision::AABB(tempCollider, cc->collider)) {
-      collisionDetected = true;
-      std::cout << "Hit something!" << std::endl;
-      break;
-    }
-  }
-
-  if (collisionDetected) {
-    float stepSize = 0.1f;
-
-    while (true) {
-      float nextVelocityX = transform.velocity.x * stepSize;
-      float nextVelocityY = transform.velocity.y * stepSize;
-
-      float nextX = transform.position.x + nextVelocityX;
-      float nextY = transform.position.y + nextVelocityY;
-
-      SDL_Rect nextTempCollider = {static_cast<int>(nextX),
-                                   static_cast<int>(nextY),
-                                   transform.width * transform.scale,
-                                   transform.height * transform.scale};
-
-      bool willCollide = false;
-      for (auto cc : Game::colliders) {
-        if (cc->tag == "wall" && Collision::AABB(nextTempCollider, cc->collider)) {
-          willCollide = true;
-          break;
-        }
-      }
-
-      if (willCollide) {
-        break;
-      }
-
-      transform.position.x = nextX;
-      transform.position.y = nextY;
-    }
-
-    transform.velocity.x = 0;
-    transform.velocity.y = 0;
-  } else {
-    transform.position.x = newX;
-    transform.position.y = newY;
-  }
+  // Note: CollisionSystem will handle collision detection and response
+  // Note: MovementSystem will apply velocity to position
+  // PlayerComponent only handles player-specific game logic!
 }
 
 void PlayerComponent::shootable() {
-  Uint32 now = SDL_GetTicks();
-  Uint32 elapsed = now - lastShootTime;
-  if (Game::inputManager.isPressed("Shoot") && elapsed >= 100) {
-    auto& transform = entity->getComponent<TransformComponent>();
-    auto& bullet(Game::manager.addEntity());
-    bullet.addComponent<TransformComponent>(transform.position.x,
-                                            transform.position.y, 32, 32, 1);
-    bullet.addComponent<BulletComponent>();
+  auto& input = entity->getComponent<InputComponent>();
+  auto& combat = entity->getComponent<CombatComponent>();
+  auto& animState = entity->getComponent<AnimationStateComponent>();
 
-    auto& playerTransform = entity->getComponent<TransformComponent>();
-    float playerVelocityX = playerTransform.velocity.x;
-    float playerVelocityY = playerTransform.velocity.y;
-
-    std::cout << "Player velocity: " << playerVelocityX << ", "
-              << playerVelocityY << std::endl;
-
-    auto& bulletTransform = bullet.getComponent<TransformComponent>();
-
-    bulletTransform.velocity.x = playerVelocityX;
-    bulletTransform.velocity.y = playerVelocityY;
-
-    switch (currentDirection) {
-      case UP:
-        bulletTransform.velocity.y += -1 * bulletSpeed;
-        break;
-      case DOWN:
-        bulletTransform.velocity.y += 1 * bulletSpeed;
-        break;
-      case LEFT:
-        bulletTransform.velocity.x += -1 * bulletSpeed;
-        break;
-      case RIGHT:
-        bulletTransform.velocity.x += 1 * bulletSpeed;
-        break;
-    }
-
-    bullet.addGroup(Game::groupEnemies);
-    lastShootTime = now;
+  // PURE ECS: Only REQUEST a shoot, don't create the bullet!
+  // CombatSystem will handle bullet spawning
+  if (input.isPressed("Shoot")) {
+    combat.requestShoot(animState.facingDirection);
   }
 }
 
@@ -147,35 +80,41 @@ void PlayerComponent::draw() {
 }
 
 void PlayerComponent::handleInput() {
-  auto& sprite = entity->getComponent<AnimatedSpriteComponent>();
   auto& transform = entity->getComponent<TransformComponent>();
+  auto& input = entity->getComponent<InputComponent>();
+  auto& animState = entity->getComponent<AnimationStateComponent>();
 
-  sprite.play("Idle");
-
+  // Reset velocity each frame
   transform.velocity = Vector2D(0.0f, 0.0f);
+  animState.isMoving = false;
 
-  if (Game::inputManager.isPressed("MoveRight")) {
-    sprite.spriteFlip = SDL_FLIP_NONE;
-    sprite.playTex("assets/walk-right.png");
+  // PURE ECS: Only set GAME STATE (velocity, direction, isMoving)
+  // AnimationSystem will choose the animation based on this state!
+
+  if (input.isPressed("MoveRight")) {
+    animState.facingDirection = AnimationStateComponent::RIGHT;
+    animState.isMoving = true;
     currentDirection = RIGHT;
     transform.velocity.x = speed;
   }
-  if (Game::inputManager.isPressed("MoveLeft")) {
-    sprite.spriteFlip = SDL_FLIP_HORIZONTAL;
-    sprite.playTex("assets/walk-right.png");
+  if (input.isPressed("MoveLeft")) {
+    animState.facingDirection = AnimationStateComponent::LEFT;
+    animState.isMoving = true;
     currentDirection = LEFT;
     transform.velocity.x = -speed;
   }
-  if (Game::inputManager.isPressed("MoveUp")) {
-    sprite.spriteFlip = SDL_FLIP_NONE;
-    sprite.playTex("assets/walk-up.png");
+  if (input.isPressed("MoveUp")) {
+    animState.facingDirection = AnimationStateComponent::UP;
+    animState.isMoving = true;
     currentDirection = UP;
     transform.velocity.y = -speed;
   }
-  if (Game::inputManager.isPressed("MoveDown")) {
-    sprite.spriteFlip = SDL_FLIP_VERTICAL;
-    sprite.playTex("assets/walk-up.png");
+  if (input.isPressed("MoveDown")) {
+    animState.facingDirection = AnimationStateComponent::DOWN;
+    animState.isMoving = true;
     currentDirection = DOWN;
     transform.velocity.y = speed;
   }
+
+  // No sprite.playTex() here! AnimationSystem handles that.
 }

@@ -10,16 +10,6 @@
 #include "scripts/ScriptComponents.hpp"
 
 SDL_Renderer* Game::renderer = nullptr;
-InputManager Game::inputManager;
-
-void setupInputs() {
-  Game::inputManager.addInput("MoveRight",
-                              {SDL_SCANCODE_D, SDL_SCANCODE_RIGHT});
-  Game::inputManager.addInput("MoveLeft", {SDL_SCANCODE_A, SDL_SCANCODE_LEFT});
-  Game::inputManager.addInput("MoveUp", {SDL_SCANCODE_W, SDL_SCANCODE_UP});
-  Game::inputManager.addInput("MoveDown", {SDL_SCANCODE_S, SDL_SCANCODE_DOWN});
-  Game::inputManager.addInput("Shoot", {SDL_SCANCODE_SPACE});
-}
 
 Map* map;
 
@@ -72,7 +62,6 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     Game::isRunning = false;
   }
 
-  setupInputs();
   audioManager.loadAudio("assets/laserShoot.wav", "laser");
 
   FontLoader::init();
@@ -105,8 +94,7 @@ void Game::handleEvents() {
 }
 void Game::update(float deltaTime) {
   manager.refresh();
-  Game::inputManager.update();
-  manager.update(deltaTime);
+  manager.update(deltaTime);  // InputSystem handles input now
   sceneManager.update(deltaTime);  // Update the current scene
 }
 

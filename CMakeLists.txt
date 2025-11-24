@@ -26,7 +26,7 @@ add_definitions(-D_THREAD_SAFE)
 # Find all source files recursively
 file(GLOB_RECURSE SOURCES src/*.cpp)
 
-# Create the executable
+# Create executable target
 add_executable(game ${SOURCES})
 
 # Link SDL libraries

@@ -40,7 +40,6 @@ class Game {
 
   static Manager manager;
   static AudioManager audioManager;
-  static InputManager inputManager;
   static void AddTile(int srcX, int srcY, int xPos, int yPos);
   static SDL_Renderer *renderer;
   static SDL_Event event;
@@ -51,7 +50,8 @@ class Game {
     groupMap,
     groupPlayers,
     groupEnemies,
-    groupColliders
+    groupColliders,
+    groupProjectiles
   };
 
  private:
