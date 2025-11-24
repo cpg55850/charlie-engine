@@ -6,6 +6,7 @@
 #include "Animation.hpp"
 #include "Components.hpp"
 #include "SDL.h"
+#include "ECS/Entity.hpp"
 class AnimatedSpriteComponent : public Component {
  private:
   TransformComponent *transform;

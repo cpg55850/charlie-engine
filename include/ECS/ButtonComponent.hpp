@@ -7,8 +7,6 @@
 #include <functional>
 #include <string>
 
-#include "ECS.hpp"
-
 // extern SDL_Renderer* renderer;  // Assuming renderer is defined elsewhere
 
 class ButtonComponent : public Component {

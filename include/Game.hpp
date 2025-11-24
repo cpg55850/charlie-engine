@@ -14,9 +14,9 @@ and may not be redistributed without written permission.*/
 
 #include "AudioManager.hpp"
 #include "Camera.hpp"
-#include "ECS/ECS.hpp"
 #include "InputManager.hpp"
 #include "SceneManager.hpp"  // Include the SceneManager header
+#include "ECS/Manager.hpp"
 
 class ColliderComponent;
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ECS.hpp"
 #include "TransformComponent.hpp"
 #include "AnimatedSpriteComponent.hpp"
 #include "ColliderComponent.hpp"

@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include "Component.hpp"
 #include "../Vector2D.hpp"
 #include "Components.hpp"
 
