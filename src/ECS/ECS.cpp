@@ -1,4 +1,4 @@
-#include "ECS.hpp"
+#include "ECS/ECS.hpp"
 
 #include <iostream>
 

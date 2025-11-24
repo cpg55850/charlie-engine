@@ -25,7 +25,7 @@ class ScriptComponent : public Component {
         "assets/walk-down.png", Animation(0, 2, 100));
     entity->getComponent<AnimatedSpriteComponent>().playTex(
         "assets/walk-right.png");
-    entity->addComponent<ColliderComponent>("player");
+    // entity->addComponent<ColliderComponent>("player");
   }
 
   void update(float deltaTime) override {

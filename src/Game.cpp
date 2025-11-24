@@ -2,13 +2,10 @@
 
 #include "Camera.hpp"
 #include "Collision.hpp"
-#include "ECS/Animation.hpp"
 #include "ECS/Components.hpp"
 #include "FontLoader.hpp"
 #include "Map.hpp"
 #include "SceneFactory.hpp"
-#include "TextureManager.hpp"
-#include "Vector2D.hpp"
 #include "scenes/MainMenu.hpp"
 #include "scripts/ScriptComponents.hpp"
 

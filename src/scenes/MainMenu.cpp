@@ -1,11 +1,11 @@
-#include "MainMenu.hpp"
+#include "scenes/MainMenu.hpp"
 
 #include <iostream>
 
-#include "../Collision.hpp"
-#include "../FontLoader.hpp"
-#include "../Map.hpp"
-#include "../scripts/ScriptComponents.hpp"
+#include "Collision.hpp"
+#include "FontLoader.hpp"
+#include "Map.hpp"
+#include "scripts/ScriptComponents.hpp"
 
 auto& player(Game::manager.addEntity());
 auto& bullet(Game::manager.addEntity());
@@ -44,29 +44,29 @@ void MainMenu::onEnter() {
   // Game::audioManager.loadAudio("assets/laserShoot.wav", "laser");
 
   player.addGroup(Game::groupPlayers);
-  wall.addGroup(Game::groupMap);
-  bullet.addGroup(Game::groupEnemies);
-  bullet2.addGroup(Game::groupEnemies);
-  enemy.addGroup(Game::groupEnemies);
-  label.addGroup(Game::groupPlayers);
+  // wall.addGroup(Game::groupMap);
+  // bullet.addGroup(Game::groupEnemies);
+  // bullet2.addGroup(Game::groupEnemies);
+  // enemy.addGroup(Game::groupEnemies);
+  // label.addGroup(Game::groupPlayers);
 
   player.addComponent<PlayerComponent>();
   // bullet.addComponent<BulletComponent>();
-  bullet2.addComponent<BulletComponent>();
-  wall.addComponent<WallComponent>();
-  enemy.addComponent<EnemyComponent>();
-  button.addComponent<ButtonComponent>();
-  label.addComponent<LabelComponent>();
+  // bullet2.addComponent<BulletComponent>();
+  // wall.addComponent<WallComponent>();
+  // enemy.addComponent<EnemyComponent>();
+  // button.addComponent<ButtonComponent>();
+  // label.addComponent<LabelComponent>();
 
-  TransformComponent labelTransform;
-  labelTransform.position.x = 0;
-  labelTransform.position.y = 0;
-  labelTransform.width = 100;
-  labelTransform.height = 100;
-  labelTransform.scale = 1;
-  label.addComponent<LabelComponent>();
-  label.getComponent<LabelComponent>().setup(font, "Hello, World!",
-                                             {255, 255, 255}, &labelTransform);
+  // TransformComponent labelTransform;
+  // labelTransform.position.x = 0;
+  // labelTransform.position.y = 0;
+  // labelTransform.width = 100;
+  // labelTransform.height = 100;
+  // labelTransform.scale = 1;
+  // label.addComponent<LabelComponent>();
+  // label.getComponent<LabelComponent>().setup(font, "Hello, World!",
+  //                                            {255, 255, 255}, &labelTransform);
 
   // button.getComponent<ButtonComponent>().setup("assets/water.png", 100, 100,
   //  100, 100, "Play", "Play");
@@ -91,12 +91,14 @@ void MainMenu::onExit() {
 
 void MainMenu::update(float deltaTime) {
   // Update entities, handle input, etc.
-  // Game::manager.update();
-  // std::cout << "updating MainMenu scene" << std::endl;
+  Game::manager.update(deltaTime);
+  std::cout << "updating MainMenu scene" << std::endl;
 
   Game::camera.update(player.getComponent<TransformComponent>().position.x,
                       player.getComponent<TransformComponent>().position.y, 16,
                       16);
+
+  std::cout << "Player position: " << player.getComponent<TransformComponent>() .position.x << ", " << player.getComponent<TransformComponent>().position.y << std::endl;
 
   // for (auto cc : Game::colliders) {
   //   Collision::AABB(player.getComponent<ColliderComponent>(), *cc);
@@ -111,7 +113,7 @@ void MainMenu::update(float deltaTime) {
 void MainMenu::draw() {
   // Render entities and other scene elements
   // Game::manager.render();
-  // std::cout << "Draw the scene" << std::endl;
+  std::cout << "Draw the scene" << std::endl;
 
   for (auto& t : tiles) {
     t->draw();

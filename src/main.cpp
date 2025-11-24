@@ -4,10 +4,10 @@ Game *game = nullptr;
 
 int main(int argc, const char *argv[]) {
   const int FPS = 60;
-  const int frameDelay = 1000 / FPS;  // 16.66ms per frame
+  const Uint32 frameDelay = 1000 / FPS;  // ms per frame
 
-  Uint32 frameStart;
-  int frameTime;
+  Uint32 lastTick = SDL_GetTicks();
+  Uint32 frameTime;
   float deltaTime;
 
   game = new Game();
@@ -16,22 +16,23 @@ int main(int argc, const char *argv[]) {
              1920 / 2, 1080 / 2, false);
 
   while (game->running()) {
-    frameStart = SDL_GetTicks();
+    Uint32 currentTick = SDL_GetTicks();
+    deltaTime = (currentTick - lastTick) / 1000.0f;
+    lastTick = currentTick;
+
     game->handleEvents();
-
-    // Calculate delta time
-    deltaTime = 1 + ((SDL_GetTicks() - frameStart) / 1000.0f);
-
     game->update(deltaTime);
     game->render();
-    frameTime = SDL_GetTicks() - frameStart;
 
+    frameTime = SDL_GetTicks() - currentTick;
     if (frameDelay > frameTime) {
       SDL_Delay(frameDelay - frameTime);
     }
   }
 
   game->clean();
+  delete game;
+  game = nullptr;
 
   return 0;
 }
