@@ -8,8 +8,6 @@
 
 class PlayerComponent : public Component {
  public:
-  enum Direction { UP, DOWN, LEFT, RIGHT };
-  Direction currentDirection = RIGHT;
   float speed = 200.0f;  // Units per second (works better with deltaTime)
 
   void init() override;

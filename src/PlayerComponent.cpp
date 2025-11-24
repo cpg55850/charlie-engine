@@ -94,25 +94,21 @@ void PlayerComponent::handleInput() {
   if (input.isPressed("MoveRight")) {
     animState.facingDirection = AnimationStateComponent::RIGHT;
     animState.isMoving = true;
-    currentDirection = RIGHT;
     transform.velocity.x = speed;
   }
   if (input.isPressed("MoveLeft")) {
     animState.facingDirection = AnimationStateComponent::LEFT;
     animState.isMoving = true;
-    currentDirection = LEFT;
     transform.velocity.x = -speed;
   }
   if (input.isPressed("MoveUp")) {
     animState.facingDirection = AnimationStateComponent::UP;
     animState.isMoving = true;
-    currentDirection = UP;
     transform.velocity.y = -speed;
   }
   if (input.isPressed("MoveDown")) {
     animState.facingDirection = AnimationStateComponent::DOWN;
     animState.isMoving = true;
-    currentDirection = DOWN;
     transform.velocity.y = speed;
   }
 
