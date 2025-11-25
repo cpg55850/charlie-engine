@@ -6,11 +6,7 @@ void Manager::update(float deltaTime) {
     for (auto& system : systems) {
         system->update(*this, deltaTime);
     }
-
-    // Update entities (for backwards compatibility with component update methods)
-    for (auto& entity : entities) {
-        entity->update(deltaTime);
-    }
+    // Entity::update removed (entities are passive data containers now)
 }
 
 void Manager::draw() {

@@ -36,6 +36,7 @@ public:
 private:
     void spawnProjectile(Manager& manager, TransformComponent& shooterTransform,
                         CombatComponent& combat) {
+        std::cout << "CombatSystem: Spawning projectile..." << std::endl;
         // System creates the bullet entity
         auto& bullet = manager.addEntity();
 
@@ -47,6 +48,7 @@ private:
             combat.projectileHeight,
             combat.projectileScale
         );
+        std::cout << "CombatSystem: Bullet transform initial pos (" << bulletTransform.position.x << ", " << bulletTransform.position.y << ")" << std::endl;
 
         // Calculate bullet velocity based on direction
         float velocityX = 0.0f;
@@ -76,6 +78,7 @@ private:
         // Add visual component
         auto& sprite = bullet.addComponent<SpriteComponent>();
         sprite.setTex(combat.projectileTexture);
+        std::cout << "CombatSystem: Bullet velocity (" << bulletTransform.velocity.x << ", " << bulletTransform.velocity.y << ")" << std::endl;
 
         // Add lifetime component - destroy bullet after 5 seconds or if off-screen
         bullet.addComponent<LifetimeComponent>(5.0f);
@@ -88,4 +91,3 @@ private:
         // bullet.addComponent<DamageComponent>(10);
     }
 };
-

@@ -18,6 +18,11 @@ class SpriteComponent : public Component {
     srcRect.x = srcRect.y = 0;
     srcRect.w = transform->width;
     srcRect.h = transform->height;
+    // Initialize destRect now so sprite renders even if component update isn't called yet
+    destRect.x = static_cast<int>(transform->position.x);
+    destRect.y = static_cast<int>(transform->position.y);
+    destRect.w = transform->width * transform->scale;
+    destRect.h = transform->height * transform->scale;
   }
 
   void setTex(const char* path) { texture = TextureManager::LoadTexture(path); }
