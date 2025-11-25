@@ -8,6 +8,7 @@
 #include "../scripts/Components.hpp"
 #include "../Game.hpp"
 #include "../../engine/utils/Vector2D.hpp"
+#include "../../engine/utils/EntityUtils.hpp"
 
 class EnemyComponent : public Component {
  public:
@@ -17,20 +18,13 @@ class EnemyComponent : public Component {
 
   void init() override {
     std::cout << "Hello from enemy" << std::endl;
-    // Initialize components only if not already present
-    if (!entity->hasComponent<TransformComponent>()) {
-      entity->addComponent<TransformComponent>(200, 400, 32, 32, 4);
-    }
-    if (!entity->hasComponent<SpriteComponent>()) {
-      auto& sprite = entity->addComponent<SpriteComponent>();
-      sprite.setTex("assets/enemy.png");
-    }
-    if (!entity->hasComponent<ColliderComponent>()) {
-      entity->addComponent<ColliderComponent>("enemy");
-    }
-    if (!entity->hasComponent<FlashOnHitComponent>()) {
-      entity->addComponent<FlashOnHitComponent>();
-    }
+    Entity& e = *entity;
+    // Initialize required components using ensureComponent helper
+    auto& transform = ensureComponent<TransformComponent>(e, 200, 400, 32, 32, 4);
+    auto& sprite    = ensureComponent<SpriteComponent>(e);
+    sprite.setTex("assets/enemy.png");  // Always ensure correct texture (safe override)
+    ensureComponent<ColliderComponent>(e, "enemy");
+    ensureComponent<FlashOnHitComponent>(e);
   }
 
   void update(float) override { /* AI handled in EnemyAISystem */ }
