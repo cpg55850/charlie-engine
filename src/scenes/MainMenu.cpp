@@ -5,6 +5,7 @@
 #include "FontLoader.hpp"
 #include "Map.hpp"
 #include "scripts/ScriptComponents.hpp"
+#include "scripts/PlayerComponent.hpp"
 #include "ECS/CameraFollowSystem.hpp"
 
 class CameraFollowComponent;
@@ -20,7 +21,7 @@ void MainMenu::onEnter() {
   // Create entities
   player = createEntity();
   player->addGroup(Game::groupPlayers);
-  player->addComponent<PlayerComponent>();
+  player->addComponent<PlayerComponent>(); // auto-wires needed components in PlayerComponent::init
   player->addComponent<CameraFollowComponent>(0, 0); // center player (assuming 1920x1080 window)
 
   enemy = createEntity();
@@ -49,17 +50,17 @@ void MainMenu::onExit() {
 
 void MainMenu::update(float deltaTime) {
   // ECS systems already ran in SceneManager::update before this call.
-  if (player && player->hasComponent<TransformComponent>()) {
-    auto& t = player->getComponent<TransformComponent>();
-    std::cout << "Player pos: (" << t.position.x << ", " << t.position.y << ") Camera: (" << Game::camera.getX() << ", " << Game::camera.getY() << ")" << std::endl;
-  }
+  // if (player && player->hasComponent<TransformComponent>()) {
+  //   auto& t = player->getComponent<TransformComponent>();
+  //   std::cout << "Player pos: (" << t.position.x << ", " << t.position.y << ") Camera: (" << Game::camera.getX() << ", " << Game::camera.getY() << ")" << std::endl;
+  // }
 }
 
 void MainMenu::draw() {
   // If RenderSystem handles all drawing, this can stay empty or draw UI overlays.
   // Example overlay using label component could be added here.
   // For demonstration, iterate over groups safely:
-  auto& playersGroup = Game::manager.getGroup(Game::groupPlayers);
-  std::cout << "Draw phase: players=" << playersGroup.size() << std::endl;
+  // auto& playersGroup = Game::manager.getGroup(Game::groupPlayers);
+  // std::cout << "Draw phase: players=" << playersGroup.size() << std::endl;
   // No direct entity->draw calls (RenderSystem already did it). This is just diagnostic.
 }

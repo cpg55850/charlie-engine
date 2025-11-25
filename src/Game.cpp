@@ -15,6 +15,7 @@
 #include "FontLoader.hpp"
 #include "Map.hpp"
 #include "SceneFactory.hpp"
+#include "ECS/PlayerInputSystem.hpp"
 #include "scenes/MainMenu.hpp"
 #include "scripts/ScriptComponents.hpp"
 
@@ -80,6 +81,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     if (!manager.hasSystem<AnimationSystem>()) manager.addSystem<AnimationSystem>();
     if (!manager.hasSystem<CameraFollowSystem>()) manager.addSystem<CameraFollowSystem>();
     if (!manager.hasSystem<RenderSystem>()) manager.addSystem<RenderSystem>();
+    if (!manager.hasSystem<PlayerInputSystem>()) manager.addSystem<PlayerInputSystem>();
 
     // Load initial scene
     sceneManager.switchScene("MainMenu");
