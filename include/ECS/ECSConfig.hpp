@@ -5,6 +5,7 @@
 
 using ComponentID = std::size_t;
 using Group = std::size_t;
+using EntityID = std::size_t; // Added for contiguous component storage mapping
 
 inline ComponentID getNewComponentTypeID() {
     static ComponentID lastID = 0u;

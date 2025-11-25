@@ -5,6 +5,9 @@
 #include <vector>
 #include <memory>
 #include "Component.hpp" // Includes ComponentID, Group, etc.
+#include "ComponentManager.hpp"
+#include <unordered_map>
+#include <stdexcept>
 
 
 class Manager {
@@ -26,10 +29,22 @@ public:
     // Get all entities (for systems to query)
     std::vector<std::unique_ptr<Entity>>& getEntities();
 
+    // Component accessors (contiguous storage)
+    template <typename T>
+    T& addComponentToEntity(Entity* entity, EntityID id) { return componentManager.addComponent<T>(id); }
+    template <typename T>
+    T& getComponentForEntity(EntityID id) { return componentManager.getComponent<T>(id); }
+    template <typename T>
+    bool hasComponentForEntity(EntityID id) { return componentManager.hasComponent<T>(id); }
+    EntityID getEntityID(Entity* e) { return entityIDs[e]; }
+
 private:
     std::vector<std::unique_ptr<Entity>> entities;
     std::array<std::vector<Entity*>, maxGroups> groupedEntities;
     std::vector<std::unique_ptr<System>> systems;
+    std::unordered_map<Entity*, EntityID> entityIDs;
+    EntityID nextID = 0;
+    ComponentManager componentManager;
 };
 
 // Template implementations for System management

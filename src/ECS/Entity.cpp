@@ -4,24 +4,21 @@
 
 // Constructor
 Entity::Entity(Manager& manager) : manager(manager), active(true) {
-    componentArray.fill(nullptr); // Ensure ComponentArray is initialized
     componentBitSet.reset();      // Reset the bitset for components
+    groupBitset.reset();
+    componentArray.fill(nullptr); // initialize restored array
 }
 
-// Update
-void Entity::update(float deltaTime) {
+// Update (no-op in pure ECS; systems drive behavior)
+void Entity::update(float /*deltaTime*/) {
     if (!active) return;
-    for (auto& c : components) {
-        if (c) c->update(deltaTime);
-    }
+    for (auto& c : components) if (c) c->update(0.f); // call component updates (deltaTime ignored placeholder)
 }
 
-// Draw
+// Draw (no-op; RenderSystem handles drawing)
 void Entity::draw() {
     if (!active) return;
-    for (auto& c : components) {
-        if (c) c->draw();
-    }
+    for (auto& c : components) if (c) c->draw();
 }
 
 // Destroy

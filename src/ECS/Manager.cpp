@@ -24,14 +24,24 @@ void Manager::refresh() {
                                    [i](Entity* e) { return !e->isActive() || !e->hasGroup(i); }),
                     group.end());
     }
+    // Remove dead entities and purge their components
     entities.erase(std::remove_if(entities.begin(), entities.end(),
-                                  [](const std::unique_ptr<Entity>& e) { return !e->isActive(); }),
+                                  [&](const std::unique_ptr<Entity>& e) {
+                                      if (!e->isActive()) {
+                                          EntityID id = entityIDs[e.get()];
+                                          componentManager.entityDestroyed(id);
+                                          entityIDs.erase(e.get());
+                                          return true;
+                                      }
+                                      return false;
+                                  }),
                    entities.end());
 }
 
 Entity& Manager::addEntity() {
     auto entity = std::make_unique<Entity>(*this);
     Entity& ref = *entity;
+    entityIDs[&ref] = nextID++;
     entities.emplace_back(std::move(entity));
     return ref;
 }

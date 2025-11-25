@@ -37,40 +37,13 @@ public:
     T& getComponent() const;
 
 private:
-    Manager& manager; // Reference to the manager that owns this entity
+    Manager& manager;
     bool active = true;
-    std::vector<std::unique_ptr<Component>> components;
-
-    // ECS-specific storage for components and groups
-    ComponentArray componentArray;
+    std::vector<std::unique_ptr<Component>> components; // restored
+    ComponentArray componentArray{}; // restored pointer array
     ComponentBitset componentBitSet;
     GroupBitset groupBitset;
 };
 
-// Implementation for templated methods
-
-template <typename T>
-bool Entity::hasComponent() const {
-    return componentBitSet[getComponentTypeID<T>()];
-}
-
-template <typename T, typename... TArgs>
-T& Entity::addComponent(TArgs&&... mArgs) {
-    auto c = std::make_unique<T>(std::forward<TArgs>(mArgs)...);
-    c->entity = this;
-    T* rawPtr = c.get();
-    components.emplace_back(std::move(c));
-    componentArray[getComponentTypeID<T>()] = rawPtr;
-    componentBitSet[getComponentTypeID<T>()] = true;
-    rawPtr->init();
-    return *rawPtr;
-}
-
-template <typename T>
-T& Entity::getComponent() const {
-    T* ptr = static_cast<T*>(componentArray[getComponentTypeID<T>()]);
-    if (!ptr) {
-        throw std::runtime_error("Component not found");
-    }
-    return *ptr;
-}
+// Include template implementations after full class definition
+#include "Entity.inl"
