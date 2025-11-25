@@ -12,11 +12,11 @@ and may not be redistributed without written permission.*/
 #include <iostream>
 #include <vector>
 
-#include "AudioManager.hpp"
-#include "Camera.hpp"
-#include "InputManager.hpp"
-#include "SceneManager.hpp"  // Include the SceneManager header
-#include "ECS/Manager.hpp"
+#include "../engine/SDLCore/AudioManager.hpp"
+#include "../engine/SDLCore/Camera.hpp"
+#include "../engine/SDLCore/InputManager.hpp"
+#include "../engine/SDLCore/SceneManager.hpp"
+#include "../engine/core/Manager.hpp"
 
 class ColliderComponent;
 

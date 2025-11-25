@@ -1,24 +1,25 @@
 #include "Game.hpp"
 
-#include "Camera.hpp"
-#include "Collision.hpp"
-#include "ECS/Components.hpp"
-#include "ECS/InputSystem.hpp"
-#include "ECS/ScriptSystem.hpp"
-#include "ECS/CombatSystem.hpp"
-#include "ECS/CollisionSystem.hpp"
-#include "ECS/MovementSystem.hpp"
-#include "ECS/LifetimeSystem.hpp"
-#include "ECS/AnimationSystem.hpp"
-#include "ECS/CameraFollowSystem.hpp"
-#include "ECS/RenderSystem.hpp"
-#include "FontLoader.hpp"
+#include "../engine/SDLCore/Camera.hpp"
+#include "../engine/SDLCore/Collision.hpp"
+#include "../include/scripts/Components.hpp"
+#include "../engine/systems/InputSystem.hpp"
+#include "../engine/systems/ScriptSystem.hpp"
+#include "../include/scripts/CombatSystem.hpp"
+#include "../engine/systems/CollisionSystem.hpp"
+#include "../engine/systems/MovementSystem.hpp"
+#include "../engine/systems/LifetimeSystem.hpp"
+#include "../engine/systems/AnimationSystem.hpp"
+#include "../engine/systems/CameraFollowSystem.hpp"
+#include "../engine/systems/RenderSystem.hpp"
+#include "../engine/SDLCore/FontLoader.hpp"
 #include "Map.hpp"
-#include "SceneFactory.hpp"
-#include "ECS/EnemyAISystem.hpp"
-#include "ECS/PlayerInputSystem.hpp"
+#include "../engine/SDLCore/SceneFactory.hpp"
+#include "../include/scripts/EnemyAISystem.hpp"
+#include "../include/scripts/PlayerInputSystem.hpp"
 #include "scenes/MainMenu.hpp"
-#include "scripts/ScriptComponents.hpp"
+#include "../include/components/ScriptComponents.hpp"
+#include "../include/scripts/FlashSystem.hpp"
 
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
@@ -80,6 +81,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     if (!manager.hasSystem<EnemyAISystem>()) manager.addSystem<EnemyAISystem>();      // AI sets velocities
     if (!manager.hasSystem<MovementSystem>()) manager.addSystem<MovementSystem>();      // 4. Apply velocity
     if (!manager.hasSystem<CollisionSystem>()) manager.addSystem<CollisionSystem>();    // 5. Resolve collisions after movement
+    if (!manager.hasSystem<FlashSystem>()) manager.addSystem<FlashSystem>();            // 5b. Expire hit flashes
     if (!manager.hasSystem<LifetimeSystem>()) manager.addSystem<LifetimeSystem>();      // 6. Cleanup timed entities
     if (!manager.hasSystem<AnimationSystem>()) manager.addSystem<AnimationSystem>();    // 7. Animate sprites
     if (!manager.hasSystem<CameraFollowSystem>()) manager.addSystem<CameraFollowSystem>(); // 8. Update camera

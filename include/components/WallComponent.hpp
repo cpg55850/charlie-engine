@@ -1,0 +1,43 @@
+#pragma once
+
+#include <cmath>
+#include <iostream>
+#include <random>
+#include <string>
+
+#include "../../engine/components/Animation.hpp"
+#include "../scripts/Components.hpp"
+#include "../Game.hpp"
+
+class WallComponent : public Component {
+ public:
+  void init() override {
+    std::cout
+        << "Hi from wall"
+        << std::endl;  // Initialize components only if not already present
+    if (!entity->hasComponent<TransformComponent>()) {
+      entity->addComponent<TransformComponent>(400, 600, 16, 16, 4);
+    }
+
+    if (!entity->hasComponent<AnimatedSpriteComponent>()) {
+      auto& sprite = entity->addComponent<AnimatedSpriteComponent>();
+      sprite.addTex("assets/wall.png", Animation(0, 1, 100));
+      sprite.playTex("assets/wall.png");
+    }
+
+    if (!entity->hasComponent<ColliderComponent>()) {
+      auto& collider = entity->addComponent<ColliderComponent>("wall");
+    }
+  }
+
+  void update(float deltaTime) override {
+    auto& sprite = entity->getComponent<AnimatedSpriteComponent>();
+    sprite.playTex("assets/wall.png");
+  }
+
+  void draw() override {
+    // Drawing logic for BulletComponent, if needed
+  }
+
+  // ~BulletComponent() { std::cout << "Bye!" << std::endl; }
+};

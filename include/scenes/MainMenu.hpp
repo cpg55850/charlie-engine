@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../ECS/Components.hpp"
-#include "../Scene.hpp"
+#include "../scripts/Components.hpp"
+#include "../../engine/SDLCore/Scene.hpp"
 #include <SDL_ttf.h>
 
 class MainMenu : public Scene {

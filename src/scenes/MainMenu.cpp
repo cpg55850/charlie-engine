@@ -2,12 +2,12 @@
 
 #include <iostream>
 
-#include "FontLoader.hpp"
+#include "../../engine/SDLCore/FontLoader.hpp"
 #include "Map.hpp"
-#include "scripts/ScriptComponents.hpp"
-#include "scripts/PlayerComponent.hpp"
-#include "ECS/CameraFollowSystem.hpp"
-#include "ECS/PlayerIdComponent.hpp"
+#include "../../include/components/ScriptComponents.hpp"
+#include "../../include/components/PlayerComponent.hpp"
+#include "../../engine/systems/CameraFollowSystem.hpp"
+#include "../../include/components/PlayerIdComponent.hpp"
 
 class CameraFollowComponent;
 MainMenu::MainMenu() : Scene("MainMenu") {}
@@ -30,15 +30,6 @@ void MainMenu::onEnter() {
       auto& t = player->getComponent<TransformComponent>();
       t.position.x = 400; t.position.y = 400;
   }
-  // Bind inputs for player1 (WASD + Space)
-  // if (player->hasComponent<InputComponent>()) {
-  //     auto& inp = player->getComponent<InputComponent>();
-  //     inp.pressedInputs["MoveUp"] = false;
-  //     inp.pressedInputs["MoveDown"] = false;
-  //     inp.pressedInputs["MoveLeft"] = false;
-  //     inp.pressedInputs["MoveRight"] = false;
-  //     inp.pressedInputs["Shoot"] = false;
-  // }
 
   // Second player
   player2 = createEntity();
@@ -50,15 +41,6 @@ void MainMenu::onEnter() {
       auto& t2 = player2->getComponent<TransformComponent>();
       t2.position.x = 800; t2.position.y = 600; // different spawn
   }
-  // if (player2->hasComponent<InputComponent>()) {
-  //     auto& inp2 = player2->getComponent<InputComponent>();
-  //     // Set up alternative keys (expect InputSystem to map these later)
-  //     inp2.pressedInputs["P2_MoveUp"] = false;
-  //     inp2.pressedInputs["P2_MoveDown"] = false;
-  //     inp2.pressedInputs["P2_MoveLeft"] = false;
-  //     inp2.pressedInputs["P2_MoveRight"] = false;
-  //     inp2.pressedInputs["P2_Shoot"] = false;
-  // }
 
   enemy = createEntity();
   enemy->addGroup(Game::groupEnemies);
@@ -87,15 +69,15 @@ void MainMenu::onExit() {
 void MainMenu::update(float deltaTime) {
   if (player && player->hasComponent<TransformComponent>()) {
     auto& t = player->getComponent<TransformComponent>();
-    std::cout << "P1 pos: (" << t.position.x << ", " << t.position.y << ") Camera: (" << Game::camera.getX() << ", " << Game::camera.getY() << ")" << std::endl;
+    // std::cout << "P1 pos: (" << t.position.x << ", " << t.position.y << ") Camera: (" << Game::camera.getX() << ", " << Game::camera.getY() << ")" << std::endl;
   }
   if (player2 && player2->hasComponent<TransformComponent>()) {
     auto& t2 = player2->getComponent<TransformComponent>();
-    std::cout << "P2 pos: (" << t2.position.x << ", " << t2.position.y << ")" << std::endl;
+    // std::cout << "P2 pos: (" << t2.position.x << ", " << t2.position.y << ")" << std::endl;
   }
   if (enemy && enemy->hasComponent<TransformComponent>()) {
     auto& et = enemy->getComponent<TransformComponent>();
-    std::cout << "Enemy pos: (" << et.position.x << ", " << et.position.y << ") vel:(" << et.velocity.x << "," << et.velocity.y << ")" << std::endl;
+    // std::cout << "Enemy pos: (" << et.position.x << ", " << et.position.y << ") vel:(" << et.velocity.x << "," << et.velocity.y << ")" << std::endl;
   }
 }
 
