@@ -13,10 +13,12 @@
 class Manager {
 public:
     void update(float deltaTime);
-    void draw();
-    void refresh();
+    void refreshGroups();      // Only prunes invalid group members
+    void destroyDeadEntities(); // Handles entity destruction + component cleanup
+    void refresh();            // Backwards compatibility: calls both
     Entity& addEntity();
     void addToGroup(Entity* entity, Group group);
+    void removeFromAllGroups(Entity* entity); // Safely purge entity pointers from all groups
     std::vector<Entity*>& getGroup(Group group);
 
     // System management
@@ -25,6 +27,14 @@ public:
 
     template <typename T>
     T& getSystem();
+
+    template <typename T>
+    bool hasSystem() {
+        for (auto& system : systems) {
+            if (dynamic_cast<T*>(system.get())) return true;
+        }
+        return false;
+    }
 
     // Get all entities (for systems to query)
     std::vector<std::unique_ptr<Entity>>& getEntities();

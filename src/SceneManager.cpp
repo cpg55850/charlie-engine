@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "Game.hpp"
 #include "SceneFactory.hpp"
 
 void SceneManager::loadScene(const std::string& sceneName) {
@@ -17,20 +18,35 @@ void SceneManager::loadScene(const std::string& sceneName) {
 }
 
 void SceneManager::switchScene(const std::string& sceneName) {
+  // If scene not loaded yet, attempt to load via factory automatically
   auto it = scenes.find(sceneName);
-  if (it != scenes.end()) {
-    if (currentScene) {
-      currentScene->onExit();
+  if (it == scenes.end()) {
+    auto created = SceneFactory::instance().createScene(sceneName);
+    if (!created) {
+      std::cerr << "Scene " << sceneName << " not registered." << std::endl;
+      return;
     }
-    currentScene = it->second.get();
-    currentScene->onEnter();
-    std::cout << "Switched to scene " << sceneName << "." << std::endl;
-  } else {
-    std::cerr << "Scene " << sceneName << " not found." << std::endl;
+    scenes[sceneName] = std::move(created);
+    it = scenes.find(sceneName);
+    std::cout << "Scene " << sceneName << " loaded." << std::endl;
   }
+
+  // Avoid re-entering the same active scene
+  if (currentScene == it->second.get()) {
+    std::cout << "Scene " << sceneName << " already active; switch skipped." << std::endl;
+    return;
+  }
+
+  if (currentScene) {
+    currentScene->onExit();
+  }
+  currentScene = it->second.get();
+  currentScene->onEnter();
+  std::cout << "Switched to scene " << sceneName << "." << std::endl;
 }
 
 void SceneManager::update(float deltaTime) {
+  Game::manager.update(deltaTime);  // InputSystem handles input now
   if (currentScene) {
     currentScene->update(deltaTime);
   }

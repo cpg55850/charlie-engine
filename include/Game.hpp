@@ -51,7 +51,8 @@ class Game {
     groupPlayers,
     groupEnemies,
     groupColliders,
-    groupProjectiles
+    groupProjectiles,
+    groupUI // added UI group
   };
 
  private:

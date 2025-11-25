@@ -9,21 +9,28 @@ void Manager::update(float deltaTime) {
     // Entity::update removed (entities are passive data containers now)
 }
 
-void Manager::draw() {
-    for (const auto& entity : entities) entity->draw();
-}
-
-void Manager::refresh() {
+void Manager::refreshGroups() {
     for (size_t i = 0; i < maxGroups; ++i) {
         auto& group = groupedEntities[i];
         group.erase(std::remove_if(group.begin(), group.end(),
                                    [i](Entity* e) { return !e->isActive() || !e->hasGroup(i); }),
                     group.end());
     }
-    // Remove dead entities and purge their components
+}
+
+void Manager::removeFromAllGroups(Entity* entity) {
+    for (size_t i = 0; i < maxGroups; ++i) {
+        auto& group = groupedEntities[i];
+        group.erase(std::remove(group.begin(), group.end(), entity), group.end());
+    }
+}
+
+void Manager::destroyDeadEntities() {
     entities.erase(std::remove_if(entities.begin(), entities.end(),
                                   [&](const std::unique_ptr<Entity>& e) {
                                       if (!e->isActive()) {
+                                          // First remove from all groups to avoid dangling pointers
+                                          removeFromAllGroups(e.get());
                                           EntityID id = entityIDs[e.get()];
                                           componentManager.entityDestroyed(id);
                                           entityIDs.erase(e.get());
@@ -32,6 +39,11 @@ void Manager::refresh() {
                                       return false;
                                   }),
                    entities.end());
+}
+
+void Manager::refresh() {
+    refreshGroups();
+    destroyDeadEntities();
 }
 
 Entity& Manager::addEntity() {

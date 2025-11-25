@@ -1,20 +1,26 @@
 #pragma once
 
-#include "../ECS/Components.hpp"  // Include any components you need
+#include "../ECS/Components.hpp"
 #include "../Scene.hpp"
+#include <SDL_ttf.h>
 
 class MainMenu : public Scene {
  public:
   MainMenu();
   ~MainMenu();
 
-  void update(float deltaTime) override;  // Update logic
-  void draw() override;                   // Render the scene
-  void onEnter() override;                // Load assets, initialize entities
-  void onExit() override;                 // Load assets, initialize entities
+  void update(float deltaTime) override;  // Calls ECS update + scene-specific logic
+  void draw() override;                   // Uses groups (or left empty if RenderSystem does all)
+  void onEnter() override;                // Create entities & add components
+  void onExit() override;                 // Mark entities for destruction
 
  private:
-  // Store your entities and components
-  std::vector<std::unique_ptr<Entity>> entities;
-  // Add any additional members as needed
+  Entity* player = nullptr;
+  Entity* bullet = nullptr;
+  Entity* bullet2 = nullptr;
+  Entity* wall = nullptr;
+  Entity* enemy = nullptr;
+  Entity* button = nullptr;
+  Entity* label = nullptr;
+  TTF_Font* font = nullptr;
 };

@@ -3,6 +3,15 @@
 #include "Camera.hpp"
 #include "Collision.hpp"
 #include "ECS/Components.hpp"
+#include "ECS/InputSystem.hpp"
+#include "ECS/ScriptSystem.hpp"
+#include "ECS/CombatSystem.hpp"
+#include "ECS/CollisionSystem.hpp"
+#include "ECS/MovementSystem.hpp"
+#include "ECS/LifetimeSystem.hpp"
+#include "ECS/AnimationSystem.hpp"
+#include "ECS/CameraFollowSystem.hpp"
+#include "ECS/RenderSystem.hpp"
 #include "FontLoader.hpp"
 #include "Map.hpp"
 #include "SceneFactory.hpp"
@@ -10,108 +19,95 @@
 #include "scripts/ScriptComponents.hpp"
 
 SDL_Renderer* Game::renderer = nullptr;
-
-Map* map;
-
 SDL_Event Game::event;
 
-Camera Game::camera = Camera(0, 0, 1920, 1080, 2000, 2000);
+Camera Game::camera(0, 0, 1920, 1080, 2000, 2000);
 
-Manager Game::manager = Manager();
+Manager Game::manager;
 AudioManager Game::audioManager;
 
-const char* mapfile = "assets/tiles.png";
-bool Game::isRunning = true;
-
-// auto& tile0(manager.addEntity());
-// auto& tile1(manager.addEntity());
-// auto& tile2(manager.addEntity());
-
 std::vector<ColliderComponent*> Game::colliders;
+
+bool Game::isRunning = true;
+const char* mapfile = "assets/tiles.png";
 
 Game::Game() {}
 Game::~Game() {}
 
 void Game::init(const char* title, int xpos, int ypos, int width, int height,
-                bool fullscreen) {
-  int flags = 0;
+                bool fullscreen)
+{
+    int flags = SDL_WINDOW_RESIZABLE;
+    if (fullscreen) {
+        flags = SDL_WINDOW_FULLSCREEN;
+    }
 
-  // Makes the window resizable and adds maximize support
-  flags = SDL_WINDOW_RESIZABLE;
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        std::cerr << "SDL initialization failed." << std::endl;
+        isRunning = false;
+        return;
+    }
 
-  if (fullscreen) {
-    flags = SDL_WINDOW_FULLSCREEN;
-  }
-
-  if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
-    std::cout << "Subsystems initialised!..." << std::endl;
+    std::cout << "Subsystems initialized!" << std::endl;
 
     window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
-    // if (window) {
-    // std::cout << "Window created!" << std::endl;
-    // }
+    renderer = SDL_CreateRenderer(window, -1,
+                                  SDL_RENDERER_ACCELERATED |
+                                  SDL_RENDERER_PRESENTVSYNC);
 
-    renderer = SDL_CreateRenderer(window, -1, 0);
-    if (renderer) {
-      SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-      // std::cout << "Renderer created!" << std::endl;
-
-      Game::isRunning = true;
+    if (!renderer) {
+        std::cerr << "Renderer creation failed." << std::endl;
+        isRunning = false;
+        return;
     }
-  } else {
-    Game::isRunning = false;
-  }
 
-  audioManager.loadAudio("assets/laserShoot.wav", "laser");
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
-  FontLoader::init();
+    // Load audio, fonts, scenes
+    audioManager.loadAudio("assets/laserShoot.wav", "laser");
+    FontLoader::init();
 
-  // if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-  //   std::cerr << "SDL_mixer could not initialize! Mix_Error: " <<
-  //   Mix_GetError()
-  //             << std::endl;
-  //   return;
-  // }
+    SceneFactory::instance().registerScene(
+        "MainMenu", []() { return std::make_unique<MainMenu>(); });
 
-  SceneFactory::instance().registerScene(
-      "MainMenu", []() { return std::make_unique<MainMenu>(); });
+    // Register ECS systems (guard against duplicate adds on re-init)
+    if (!manager.hasSystem<InputSystem>()) manager.addSystem<InputSystem>();
+    if (!manager.hasSystem<ScriptSystem>()) manager.addSystem<ScriptSystem>();
+    if (!manager.hasSystem<CombatSystem>()) manager.addSystem<CombatSystem>();
+    if (!manager.hasSystem<CollisionSystem>()) manager.addSystem<CollisionSystem>();
+    if (!manager.hasSystem<MovementSystem>()) manager.addSystem<MovementSystem>();
+    if (!manager.hasSystem<LifetimeSystem>()) manager.addSystem<LifetimeSystem>();
+    if (!manager.hasSystem<AnimationSystem>()) manager.addSystem<AnimationSystem>();
+    if (!manager.hasSystem<CameraFollowSystem>()) manager.addSystem<CameraFollowSystem>();
+    if (!manager.hasSystem<RenderSystem>()) manager.addSystem<RenderSystem>();
 
-  // Initialize SceneManager and load initial scene
-  sceneManager.loadScene("MainMenu");
-  sceneManager.switchScene("MainMenu");
-  // map = new Map();
+    // Load initial scene
+    sceneManager.switchScene("MainMenu");
 }
 
 void Game::handleEvents() {
   SDL_PollEvent(&event);
-  switch (event.type) {
-    case SDL_QUIT:
-      isRunning = false;
-      break;
-    default:
-      break;
+  if (event.type == SDL_QUIT) {
+    isRunning = false;
   }
 }
+
 void Game::update(float deltaTime) {
-  manager.refresh();
-  manager.update(deltaTime);  // InputSystem handles input now
-  sceneManager.update(deltaTime);  // Update the current scene
+  sceneManager.update(deltaTime);  // Update scene logic
+  manager.refresh();               // Cleanup ECS entities/groups
 }
 
 void Game::render() {
   SDL_RenderClear(renderer);
-  sceneManager.draw();  // Draw the current scene
-
-  // for (auto& t : tiles) {
-  //   t->draw();
-  // }
-  // for (auto& p : players) {
-  //   p->draw();
-  // }
-  // for (auto& e : enemies) {
-  //   e->draw();
-  // }
-
+  // Run render system now (draw happens after clear)
+  try {
+    auto &renderSystem = manager.getSystem<RenderSystem>();
+    renderSystem.update(manager, 0.f); // deltaTime not needed for drawing
+  } catch (const std::exception &e) {
+    // RenderSystem might not be registered yet
+  }
+  // Scene-specific overlays (UI) can still draw
+  sceneManager.draw();
   SDL_RenderPresent(renderer);
 }
 
