@@ -1,0 +1,14 @@
+{
+  "name": "game-engine",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "sdl2",
+    "sdl2-image",
+    {
+      "name": "sdl2-mixer",
+      "features": [ "opusfile", "mpg123" ]
+    },
+    "sdl2-ttf"
+  ],
+  "builtin-baseline": "9aee6e968f51e15ee93606f064691d8f6d228190"
+}

@@ -1,49 +1,50 @@
+# cmake -B build -DCMAKE_TOOLCHAIN_FILE=~/vcpkg/scripts/buildsystems/vcpkg.cmake
+# cmake --build build
+# ./bin/game
+
 cmake_minimum_required(VERSION 3.15)
-project(GameEngine)
+project(GameEngine LANGUAGES CXX)
 
-# C++ standard
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
-# Include directories
-include_directories(
-        include
-        engine/include
-        engine
-        /opt/homebrew/include/SDL2
-        /opt/homebrew/Cellar/sdl2_image/2.8.2_1/include/SDL2
-        /opt/homebrew/Cellar/sdl2_mixer/2.8.0/include/SDL2
-        /opt/homebrew/Cellar/sdl2_ttf/2.22.0/include/SDL2
-)
-
-# Link directories for SDL libraries
-link_directories(/opt/homebrew/lib)
-
-# Compiler definitions (like -D_THREAD_SAFE)
-add_definitions(-D_THREAD_SAFE)
-
-# Gather ALL source files (game + engine)
+# Collect sources
 file(GLOB_RECURSE ENGINE_SOURCES engine/*.cpp)
 file(GLOB_RECURSE GAME_SOURCES src/*.cpp)
-set(SOURCES
+
+# Shared headers directory (create `include/Game.hpp`)
+set(PROJECT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+
+add_executable(game
         ${ENGINE_SOURCES}
         ${GAME_SOURCES}
 )
 
-# Create executable target
-add_executable(game ${SOURCES})
-
-# Link SDL libraries
-target_link_libraries(game
-        SDL2
-        SDL2_image
-        SDL2_mixer
-        SDL2_ttf
+# Include paths (add new include directory)
+target_include_directories(game
+        PRIVATE
+        ${PROJECT_INCLUDE_DIR}
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/engine
+        ${CMAKE_SOURCE_DIR}/engine/SDLCore
 )
 
-# Release/Debug flags
-set(CMAKE_CXX_FLAGS_RELEASE "-O2")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG")
+find_package(SDL2 CONFIG REQUIRED)
+find_package(SDL2_image CONFIG REQUIRED)
+find_package(SDL2_mixer CONFIG REQUIRED)
+find_package(SDL2_ttf CONFIG REQUIRED)
+
+target_link_libraries(game
+        PRIVATE
+        SDL2::SDL2
+        SDL2::SDL2main
+        SDL2_image::SDL2_image-static
+        SDL2_mixer::SDL2_mixer-static
+        SDL2_ttf::SDL2_ttf-static
+)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_options(game PRIVATE -O2)
+else()
+    target_compile_options(game PRIVATE -g -O0 -DDEBUG)
+endif()
