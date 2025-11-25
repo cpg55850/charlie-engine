@@ -4,9 +4,7 @@
 
 #include "FontLoader.hpp"
 #include "Map.hpp"
-#include "ECS/Systems.hpp"
 #include "scripts/ScriptComponents.hpp"
-#include "Collision.hpp"
 #include "ECS/CameraFollowSystem.hpp"
 
 class CameraFollowComponent;
@@ -20,24 +18,24 @@ void MainMenu::onEnter() {
   Map::LoadMap("assets/WHAT.csv", 4, 4);
 
   // Create entities
-  player = &Game::manager.addEntity();
+  player = createEntity();
   player->addGroup(Game::groupPlayers);
   player->addComponent<PlayerComponent>();
   player->addComponent<CameraFollowComponent>(0, 0); // center player (assuming 1920x1080 window)
 
-  enemy = &Game::manager.addEntity();
+  enemy = createEntity();
   enemy->addGroup(Game::groupEnemies);
   // enemy->addComponent<EnemyComponent>(); // Uncomment when implemented
 
-  wall = &Game::manager.addEntity();
+  wall = createEntity();
   wall->addGroup(Game::groupMap);
   // wall->addComponent<WallComponent>(); // Uncomment when implemented
 
-  button = &Game::manager.addEntity();
+  button = createEntity();
   button->addGroup(Game::groupUI);
   // button->addComponent<ButtonComponent>(); // Uncomment when implemented
 
-  label = &Game::manager.addEntity();
+  label = createEntity();
   label->addGroup(Game::groupUI);
   // label->addComponent<LabelComponent>(); // Uncomment when implemented
 
@@ -46,14 +44,7 @@ void MainMenu::onEnter() {
 
 void MainMenu::onExit() {
   std::cout << "MainMenu::onExit" << std::endl;
-  // Mark entities inactive (systems/manager will clean them up)
-  auto destroyIf = [](Entity* e) { if (e) e->destroy(); };
-  destroyIf(player);
-  destroyIf(enemy);
-  destroyIf(wall);
-  destroyIf(button);
-  destroyIf(label);
-  // font cleanup handled by FontLoader globally
+  // No manual destroy needed; Scene base destructor handles ownedEntities
 }
 
 void MainMenu::update(float deltaTime) {
