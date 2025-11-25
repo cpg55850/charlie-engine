@@ -16,6 +16,7 @@ class MainMenu : public Scene {
 
  private:
   Entity* player = nullptr;
+  Entity* player2 = nullptr; // second player instance
   Entity* bullet = nullptr;
   Entity* bullet2 = nullptr;
   Entity* wall = nullptr;

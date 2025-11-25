@@ -28,6 +28,7 @@ public:
             transform.velocity = Vector2D(0,0);
             animState.isMoving = false;
 
+            // Movement based on canonical keys only
             if (input.isPressed("MoveRight")) {
                 animState.facingDirection = AnimationStateComponent::RIGHT;
                 animState.isMoving = true;
@@ -48,8 +49,6 @@ public:
                 animState.isMoving = true;
                 transform.velocity.y = player.speed;
             }
-
-            // Shooting request routed to CombatSystem
             if (input.isPressed("Shoot")) {
                 combat.requestShoot(animState.facingDirection);
             }

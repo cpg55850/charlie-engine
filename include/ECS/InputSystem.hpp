@@ -3,6 +3,7 @@
 #include "System.hpp"
 #include "Manager.hpp"
 #include "InputComponent.hpp"
+#include "PlayerIdComponent.hpp"
 #include <SDL.h>
 
 // System that handles input processing directly from SDL
@@ -16,31 +17,29 @@ public:
         // Populate InputComponent for all entities that have one
         for (auto& entity : manager.getEntities()) {
             if (!entity->isActive()) continue;
+            if (!entity->hasComponent<InputComponent>()) continue;
 
-            if (entity->hasComponent<InputComponent>()) {
-                auto& input = entity->getComponent<InputComponent>();
+            auto& input = entity->getComponent<InputComponent>();
+            int pid = 0;
+            if (entity->hasComponent<PlayerIdComponent>()) {
+                pid = entity->getComponent<PlayerIdComponent>().id;
+            }
+            // Clear previous frame states (basic approach)
+            input.pressedInputs.clear();
 
-                // Read input directly from SDL and populate InputComponent
-                // This is pure ECS - no external managers needed!
-
-                // Movement keys
-                input.setInput("MoveRight",
-                    keyboardState[SDL_SCANCODE_D] || keyboardState[SDL_SCANCODE_RIGHT]);
-                input.setInput("MoveLeft",
-                    keyboardState[SDL_SCANCODE_A] || keyboardState[SDL_SCANCODE_LEFT]);
-                input.setInput("MoveUp",
-                    keyboardState[SDL_SCANCODE_W] || keyboardState[SDL_SCANCODE_UP]);
-                input.setInput("MoveDown",
-                    keyboardState[SDL_SCANCODE_S] || keyboardState[SDL_SCANCODE_DOWN]);
-
-                // Action keys
-                input.setInput("Shoot", keyboardState[SDL_SCANCODE_SPACE]);
-
-                // Add more inputs as needed
-                // input.setInput("Jump", keyboardState[SDL_SCANCODE_SPACE]);
-                // input.setInput("Interact", keyboardState[SDL_SCANCODE_E]);
+            if (pid == 0) {
+                input.setInput("MoveRight", keyboardState[SDL_SCANCODE_D]);
+                input.setInput("MoveLeft",  keyboardState[SDL_SCANCODE_A]);
+                input.setInput("MoveUp",    keyboardState[SDL_SCANCODE_W]);
+                input.setInput("MoveDown",  keyboardState[SDL_SCANCODE_S]);
+                input.setInput("Shoot",     keyboardState[SDL_SCANCODE_SPACE]);
+            } else if (pid == 1) {
+                input.setInput("MoveRight", keyboardState[SDL_SCANCODE_RIGHT]);
+                input.setInput("MoveLeft",  keyboardState[SDL_SCANCODE_LEFT]);
+                input.setInput("MoveUp",    keyboardState[SDL_SCANCODE_UP]);
+                input.setInput("MoveDown",  keyboardState[SDL_SCANCODE_DOWN]);
+                input.setInput("Shoot",     keyboardState[SDL_SCANCODE_RCTRL] || keyboardState[SDL_SCANCODE_RSHIFT]);
             }
         }
     }
 };
-
