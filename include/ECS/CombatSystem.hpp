@@ -78,6 +78,8 @@ private:
         // Add visual component
         auto& sprite = bullet.addComponent<SpriteComponent>();
         sprite.setTex(combat.projectileTexture);
+        bullet.addComponent<ColliderComponent>("projectile");
+        bullet.addComponent<DamageComponent>(1);
         // std::cout << "CombatSystem: Bullet velocity (" << bulletTransform.velocity.x << ", " << bulletTransform.velocity.y << ")" << std::endl;
 
         // Add lifetime component - destroy bullet after 5 seconds or if off-screen
@@ -88,6 +90,5 @@ private:
 
         // Could add more components:
         // bullet.addComponent<ColliderComponent>("projectile");
-        // bullet.addComponent<DamageComponent>(10);
     }
 };

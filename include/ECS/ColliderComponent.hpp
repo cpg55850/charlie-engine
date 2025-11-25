@@ -14,15 +14,14 @@ class ColliderComponent : public Component {
 
   TransformComponent* transform;
 
-  ColliderComponent(std::string t) { tag = t; }
+  explicit ColliderComponent(std::string t) : collider{0,0,0,0}, tag(std::move(t)), transform(nullptr) {}
 
   void init() override {
-    // Commented because this was causing an error
-    // if (!entity->hasComponent<TransformComponent>()) {
-    //   entity->addComponent<TransformComponent>();
-    // }
     transform = &entity->getComponent<TransformComponent>();
-
+    collider.x = static_cast<int>(transform->position.x);
+    collider.y = static_cast<int>(transform->position.y);
+    collider.w = transform->width * transform->scale;
+    collider.h = transform->height * transform->scale;
     Game::colliders.push_back(this);
   }
 

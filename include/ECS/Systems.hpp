@@ -12,4 +12,4 @@
 #include "AudioSystem.hpp"
 #include "ScriptSystem.hpp"
 #include "RenderSystem.hpp"
-
+#include "EnemyAISystem.hpp"

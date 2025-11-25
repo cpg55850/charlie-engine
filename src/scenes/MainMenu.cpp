@@ -31,14 +31,14 @@ void MainMenu::onEnter() {
       t.position.x = 400; t.position.y = 400;
   }
   // Bind inputs for player1 (WASD + Space)
-  if (player->hasComponent<InputComponent>()) {
-      auto& inp = player->getComponent<InputComponent>();
-      inp.pressedInputs["MoveUp"] = false;
-      inp.pressedInputs["MoveDown"] = false;
-      inp.pressedInputs["MoveLeft"] = false;
-      inp.pressedInputs["MoveRight"] = false;
-      inp.pressedInputs["Shoot"] = false;
-  }
+  // if (player->hasComponent<InputComponent>()) {
+  //     auto& inp = player->getComponent<InputComponent>();
+  //     inp.pressedInputs["MoveUp"] = false;
+  //     inp.pressedInputs["MoveDown"] = false;
+  //     inp.pressedInputs["MoveLeft"] = false;
+  //     inp.pressedInputs["MoveRight"] = false;
+  //     inp.pressedInputs["Shoot"] = false;
+  // }
 
   // Second player
   player2 = createEntity();
@@ -50,19 +50,19 @@ void MainMenu::onEnter() {
       auto& t2 = player2->getComponent<TransformComponent>();
       t2.position.x = 800; t2.position.y = 600; // different spawn
   }
-  if (player2->hasComponent<InputComponent>()) {
-      auto& inp2 = player2->getComponent<InputComponent>();
-      // Set up alternative keys (expect InputSystem to map these later)
-      inp2.pressedInputs["P2_MoveUp"] = false;
-      inp2.pressedInputs["P2_MoveDown"] = false;
-      inp2.pressedInputs["P2_MoveLeft"] = false;
-      inp2.pressedInputs["P2_MoveRight"] = false;
-      inp2.pressedInputs["P2_Shoot"] = false;
-  }
+  // if (player2->hasComponent<InputComponent>()) {
+  //     auto& inp2 = player2->getComponent<InputComponent>();
+  //     // Set up alternative keys (expect InputSystem to map these later)
+  //     inp2.pressedInputs["P2_MoveUp"] = false;
+  //     inp2.pressedInputs["P2_MoveDown"] = false;
+  //     inp2.pressedInputs["P2_MoveLeft"] = false;
+  //     inp2.pressedInputs["P2_MoveRight"] = false;
+  //     inp2.pressedInputs["P2_Shoot"] = false;
+  // }
 
   enemy = createEntity();
   enemy->addGroup(Game::groupEnemies);
-  // enemy->addComponent<EnemyComponent>(); // Uncomment when implemented
+  enemy->addComponent<EnemyComponent>();
 
   wall = createEntity();
   wall->addGroup(Game::groupMap);
@@ -92,6 +92,10 @@ void MainMenu::update(float deltaTime) {
   if (player2 && player2->hasComponent<TransformComponent>()) {
     auto& t2 = player2->getComponent<TransformComponent>();
     std::cout << "P2 pos: (" << t2.position.x << ", " << t2.position.y << ")" << std::endl;
+  }
+  if (enemy && enemy->hasComponent<TransformComponent>()) {
+    auto& et = enemy->getComponent<TransformComponent>();
+    std::cout << "Enemy pos: (" << et.position.x << ", " << et.position.y << ") vel:(" << et.velocity.x << "," << et.velocity.y << ")" << std::endl;
   }
 }
 

@@ -15,6 +15,7 @@
 #include "FontLoader.hpp"
 #include "Map.hpp"
 #include "SceneFactory.hpp"
+#include "ECS/EnemyAISystem.hpp"
 #include "ECS/PlayerInputSystem.hpp"
 #include "scenes/MainMenu.hpp"
 #include "scripts/ScriptComponents.hpp"
@@ -71,17 +72,18 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     SceneFactory::instance().registerScene(
         "MainMenu", []() { return std::make_unique<MainMenu>(); });
 
-    // Register ECS systems (guard against duplicate adds on re-init)
-    if (!manager.hasSystem<InputSystem>()) manager.addSystem<InputSystem>();
-    if (!manager.hasSystem<ScriptSystem>()) manager.addSystem<ScriptSystem>();
-    if (!manager.hasSystem<CombatSystem>()) manager.addSystem<CombatSystem>();
-    if (!manager.hasSystem<CollisionSystem>()) manager.addSystem<CollisionSystem>();
-    if (!manager.hasSystem<MovementSystem>()) manager.addSystem<MovementSystem>();
-    if (!manager.hasSystem<LifetimeSystem>()) manager.addSystem<LifetimeSystem>();
-    if (!manager.hasSystem<AnimationSystem>()) manager.addSystem<AnimationSystem>();
-    if (!manager.hasSystem<CameraFollowSystem>()) manager.addSystem<CameraFollowSystem>();
-    if (!manager.hasSystem<RenderSystem>()) manager.addSystem<RenderSystem>();
-    if (!manager.hasSystem<PlayerInputSystem>()) manager.addSystem<PlayerInputSystem>();
+    // Register ECS systems (guard against duplicate adds on re-init) in proper order
+    if (!manager.hasSystem<InputSystem>()) manager.addSystem<InputSystem>();            // 1. Poll raw input
+    if (!manager.hasSystem<PlayerInputSystem>()) manager.addSystem<PlayerInputSystem>(); // 2. Translate input to movement/combat intent
+    if (!manager.hasSystem<ScriptSystem>()) manager.addSystem<ScriptSystem>();          // (Optional legacy scripts)
+    if (!manager.hasSystem<CombatSystem>()) manager.addSystem<CombatSystem>();          // 3. Spawn projectiles from requests
+    if (!manager.hasSystem<EnemyAISystem>()) manager.addSystem<EnemyAISystem>();      // AI sets velocities
+    if (!manager.hasSystem<MovementSystem>()) manager.addSystem<MovementSystem>();      // 4. Apply velocity
+    if (!manager.hasSystem<CollisionSystem>()) manager.addSystem<CollisionSystem>();    // 5. Resolve collisions after movement
+    if (!manager.hasSystem<LifetimeSystem>()) manager.addSystem<LifetimeSystem>();      // 6. Cleanup timed entities
+    if (!manager.hasSystem<AnimationSystem>()) manager.addSystem<AnimationSystem>();    // 7. Animate sprites
+    if (!manager.hasSystem<CameraFollowSystem>()) manager.addSystem<CameraFollowSystem>(); // 8. Update camera
+    if (!manager.hasSystem<RenderSystem>()) manager.addSystem<RenderSystem>();          // 9. Draw everything
 
     // Load initial scene
     sceneManager.switchScene("MainMenu");

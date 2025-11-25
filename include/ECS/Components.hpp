@@ -12,6 +12,8 @@
 #include "ButtonComponent.hpp"
 #include "LabelComponent.hpp"
 #include "InputComponent.hpp"
+#include "DamageComponent.hpp"
+#include "FlashOnHitComponent.hpp"
 
 // Forward declare new components from system headers
 // They are defined in their respective system files

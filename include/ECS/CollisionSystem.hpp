@@ -5,6 +5,7 @@
 #include "Components.hpp"
 #include "../Collision.hpp"
 #include "../Game.hpp"
+#include "scripts/EnemyComponent.hpp"
 
 // System that handles collision detection and response
 // Prevents entities from moving into solid colliders
@@ -22,7 +23,6 @@ public:
                 entity->hasComponent<ColliderComponent>()) {
 
                 auto& transform = entity->getComponent<TransformComponent>();
-                auto& collider = entity->getComponent<ColliderComponent>();
 
                 // Predict next position based on velocity
                 float newX = transform.position.x + transform.velocity.x * deltaTime;
@@ -79,15 +79,33 @@ private:
     }
 
     void handleCollision(Entity* entityA, Entity* entityB) {
-        // Entity-to-entity collision response
-        // This is where you'd handle player hitting enemy, bullet hitting target, etc.
-        // For now, detection only
-
         auto& colliderA = entityA->getComponent<ColliderComponent>();
         auto& colliderB = entityB->getComponent<ColliderComponent>();
-
-        // Example: Could trigger events, damage, etc.
-        // if (colliderA.tag == "player" && colliderB.tag == "enemy") { ... }
+        // Bullet hits enemy
+        if ((colliderA.tag == "projectile" && colliderB.tag == "enemy") ||
+            (colliderB.tag == "projectile" && colliderA.tag == "enemy")) {
+            std::cout << "CollisionSystem: projectile hit enemy" << std::endl;
+            Entity* bullet = (colliderA.tag == "projectile") ? entityA : entityB;
+            Entity* enemy  = (colliderA.tag == "enemy") ? entityA : entityB;
+            if (enemy->hasComponent<FlashOnHitComponent>()) {
+                auto& flash = enemy->getComponent<FlashOnHitComponent>();
+                flash.trigger();
+            }
+            int dmg = 1;
+            if (bullet->hasComponent<DamageComponent>()) {
+                dmg = bullet->getComponent<DamageComponent>().damage;
+            }
+            if (enemy->hasComponent<EnemyComponent>()) {
+                auto& ec = enemy->getComponent<EnemyComponent>();
+                ec.health -= dmg;
+                std::cout << "Enemy health now: " << ec.health << std::endl;
+                if (ec.health <= 0) {
+                    std::cout << "Enemy destroyed" << std::endl;
+                    enemy->destroy();
+                }
+            }
+            bullet->destroy();
+            return; // done
+        }
     }
 };
-
