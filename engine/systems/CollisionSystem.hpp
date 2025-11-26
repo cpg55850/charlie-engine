@@ -12,7 +12,7 @@
 // and performs overlap detection using a sweep-and-prune broad-phase followed by AABB.
 class CollisionSystem : public System {
 public:
-    void update(Manager& manager, float /*deltaTime*/) override {
+    void update(Manager& manager, float deltaTime) override {
         auto& entities = manager.getEntities();
 
         struct Item {
@@ -36,19 +36,27 @@ public:
             auto& t = e->getComponent<TransformComponent>();
             auto& c = e->getComponent<ColliderComponent>();
 
-            // Sync collider to transform
-            c.collider.x = static_cast<int>(t.position.x);
-            c.collider.y = static_cast<int>(t.position.y);
-            c.collider.w = t.width * t.scale;
-            c.collider.h = t.height * t.scale;
+            // Sync collider to transform (current)
+            const int curX = static_cast<int>(t.position.x);
+            const int curY = static_cast<int>(t.position.y);
+            const int w = t.width * t.scale;
+            const int h = t.height * t.scale;
+            c.collider.x = curX;
+            c.collider.y = curY;
+            c.collider.w = w;
+            c.collider.h = h;
+
+            // Compute previous position from velocity and deltaTime to form a swept AABB
+            const int prevX = static_cast<int>(t.position.x - t.velocity.x * deltaTime);
+            const int prevY = static_cast<int>(t.position.y - t.velocity.y * deltaTime);
 
             Item it{};
             it.ent = e;
             it.col = &c;
-            it.left = c.collider.x;
-            it.right = c.collider.x + c.collider.w;
-            it.top = c.collider.y;
-            it.bottom = c.collider.y + c.collider.h;
+            it.left = std::min(curX, prevX);
+            it.right = std::max(curX + w, prevX + w);
+            it.top = std::min(curY, prevY);
+            it.bottom = std::max(curY + h, prevY + h);
             colliders.push_back(it);
         }
 

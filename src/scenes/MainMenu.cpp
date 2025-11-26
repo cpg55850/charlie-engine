@@ -87,10 +87,16 @@ void MainMenu::update(float deltaTime) {
     // std::cout << "Enemy pos: (" << et.position.x << ", " << et.position.y << ") vel:(" << et.velocity.x << "," << et.velocity.y << ")" << std::endl;
   }
   // Update HUD label with player health
+  // Update HUD label with player health only when it changes to avoid expensive TTF updates
   if (label && label->hasComponent<LabelComponent>() && player && player->hasComponent<PlayerComponent>()) {
     auto& pc = player->getComponent<PlayerComponent>();
     auto& lbl = label->getComponent<LabelComponent>();
-    lbl.setText("Health: " + std::to_string(pc.health));
+    auto& t = label->getComponent<TransformComponent>();
+    int lastHealth = t.width; // reuse transform.width as small storage for lastHealth (cheap)
+    if (lastHealth != pc.health) {
+      lbl.setText("Health: " + std::to_string(pc.health));
+      t.width = pc.health; // store new lastHealth
+    }
   }
 }
 
