@@ -71,7 +71,7 @@ endif()
 
 # Path to assets
 set(ASSETS_SRC "${CMAKE_SOURCE_DIR}/assets")
-set(ASSETS_DST "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")
+set(ASSETS_DST "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/assets")
 
 # Custom command to copy assets after build
 add_custom_command(TARGET game POST_BUILD
