@@ -25,25 +25,9 @@ void Manager::removeFromAllGroups(Entity* entity) {
     }
 }
 
-void Manager::destroyDeadEntities() {
-    entities.erase(std::remove_if(entities.begin(), entities.end(),
-                                  [&](const std::unique_ptr<Entity>& e) {
-                                      if (!e->isActive()) {
-                                          // First remove from all groups to avoid dangling pointers
-                                          removeFromAllGroups(e.get());
-                                          EntityID id = entityIDs[e.get()];
-                                          componentManager.entityDestroyed(id);
-                                          entityIDs.erase(e.get());
-                                          return true;
-                                      }
-                                      return false;
-                                  }),
-                   entities.end());
-}
 
 void Manager::refresh() {
     refreshGroups();
-    destroyDeadEntities();
 }
 
 Entity& Manager::addEntity() {

@@ -16,13 +16,4 @@ struct PlayerComponent : public Component {
   PlayerComponent(float s, int h = 10, int a = 0) : speed(s), health(h), ammo(a) {}
 
   void init() override;  // implemented in .cpp to attach required components
-
-  void applyDamage(int dmg) {
-    // Subtract damage from health and destroy player when health <= 0
-    health -= dmg;
-    std::cout << "Player took " << dmg << " damage, health=" << health << "\n";
-    if (health <= 0) {
-      if (entity) entity->destroy();
-    }
-  }
 };

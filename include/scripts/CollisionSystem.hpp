@@ -91,7 +91,8 @@ protected:
         // If target is a player, apply damage and destroy projectile
         if (target->hasComponent<PlayerComponent>()) {
             auto& player = target->getComponent<PlayerComponent>();
-            player.applyDamage(dmg);
+            player.health -= dmg;
+            std::cout << "player health now: " << player.health << std::endl;
             bullet->destroy();
             return;
         }
