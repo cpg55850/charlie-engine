@@ -1,3 +1,5 @@
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
 #include "Game.hpp"
 
 int main(int argc, const char *argv[]) {

@@ -48,3 +48,14 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 else()
     target_compile_options(game PRIVATE -g -O0 -DDEBUG)
 endif()
+
+# Path to assets
+set(ASSETS_SRC "${CMAKE_SOURCE_DIR}/assets")
+set(ASSETS_DST "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")
+
+# Custom command to copy assets after build
+add_custom_command(TARGET game POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${ASSETS_SRC} ${ASSETS_DST}
+        COMMENT "Copying assets folder to build directory"
+)
