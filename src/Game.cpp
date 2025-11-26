@@ -6,7 +6,7 @@
 #include "../engine/systems/InputSystem.hpp"
 #include "../engine/systems/ScriptSystem.hpp"
 #include "../include/scripts/CombatSystem.hpp"
-#include "../engine/systems/CollisionSystem.hpp"
+#include "../include/scripts/CollisionSystem.hpp"
 #include "../engine/systems/MovementSystem.hpp"
 #include "../engine/systems/LifetimeSystem.hpp"
 #include "../engine/systems/AnimationSystem.hpp"
@@ -80,7 +80,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     if (!manager.hasSystem<CombatSystem>()) manager.addSystem<CombatSystem>();          // 3. Spawn projectiles from requests
     if (!manager.hasSystem<EnemyAISystem>()) manager.addSystem<EnemyAISystem>();      // AI sets velocities
     if (!manager.hasSystem<MovementSystem>()) manager.addSystem<MovementSystem>();      // 4. Apply velocity
-    if (!manager.hasSystem<CollisionSystem>()) manager.addSystem<CollisionSystem>();    // 5. Resolve collisions after movement
+    if (!manager.hasSystem<GameCollisionSystem>()) manager.addSystem<GameCollisionSystem>();    // 5. Resolve collisions after movement
     if (!manager.hasSystem<FlashSystem>()) manager.addSystem<FlashSystem>();            // 5b. Expire hit flashes
     if (!manager.hasSystem<LifetimeSystem>()) manager.addSystem<LifetimeSystem>();      // 6. Cleanup timed entities
     if (!manager.hasSystem<AnimationSystem>()) manager.addSystem<AnimationSystem>();    // 7. Animate sprites

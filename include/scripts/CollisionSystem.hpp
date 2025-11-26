@@ -1,18 +1,23 @@
 #pragma once
 // Game-specific CollisionSystem (uses Game::colliders, enemy combat logic)
-#include "../ECS/Components.hpp"
+#include "Components.hpp"
 #include "../Game.hpp"
-#include "../../engine/core/System.hpp"
 #include "../../engine/core/Manager.hpp"
-#include "../Collision.hpp"
-#include "scripts/EnemyComponent.hpp"
+#include "../../engine/systems/CollisionSystem.hpp" // inherit from engine system
+#include "Collision.hpp"
+#include "../components/EnemyComponent.hpp"
 #include <iostream>
 
-class CollisionSystem : public System {
+// Rename to GameCollisionSystem to avoid conflicting type name with engine::CollisionSystem
+class GameCollisionSystem : public ::CollisionSystem {
 public:
+    // Keep predictive wall collision specific to the game
     void update(Manager& manager, float dt) override {
+        // First, run the engine-level behavior (sync colliders and detect overlaps)
+        ::CollisionSystem::update(manager, dt);
+
+        // Then run predictive wall collision logic (game specific)
         auto& entities = manager.getEntities();
-        // Predictive wall collision
         for (auto& e : entities) {
             if (!e->isActive()) continue;
             if (!e->hasComponent<TransformComponent>() || !e->hasComponent<ColliderComponent>()) continue;
@@ -24,34 +29,28 @@ public:
                 tr.velocity.x = 0; tr.velocity.y = 0;
             }
         }
-        // Entity-entity collision
-        for (size_t i=0;i<entities.size();++i) {
-            Entity* a = entities[i].get();
-            if (!validCollider(a)) continue;
-            for (size_t j=i+1;j<entities.size();++j) {
-                Entity* b = entities[j].get();
-                if (!validCollider(b)) continue;
-                if (Collision::AABB(a->getComponent<ColliderComponent>(), b->getComponent<ColliderComponent>())) {
-                    handle(a,b);
-                }
-            }
-        }
     }
-private:
-    bool validCollider(Entity* e) { return e->isActive() && e->hasComponent<ColliderComponent>(); }
-    bool hitsWall(const SDL_Rect& predicted) {
-        for (auto* cc : Game::colliders) {
-            if (cc->tag == "wall" && Collision::AABB(predicted, cc->collider)) return true;
-        }
-        return false;
-    }
-    void handle(Entity* a, Entity* b) {
+
+protected:
+    // Override the engine hook to implement project-specific hit responses
+    void onOverlap(class Entity* a, class Entity* b) override {
         auto& ca = a->getComponent<ColliderComponent>();
         auto& cb = b->getComponent<ColliderComponent>();
-        bool bulletEnemy = (ca.tag=="projectile" && cb.tag=="enemy") || (cb.tag=="projectile" && ca.tag=="enemy");
-        if (!bulletEnemy) return;
-        Entity* bullet = (ca.tag=="projectile") ? a : b;
-        Entity* enemy  = (ca.tag=="enemy") ? a : b;
+
+        // Determine which entity is the bullet and which is the enemy
+        Entity* bullet = nullptr;
+        Entity* enemy  = nullptr;
+
+        if (ca.tag == "projectile" && cb.tag == "enemy") {
+            bullet = a;
+            enemy  = b;
+        } else if (cb.tag == "projectile" && ca.tag == "enemy") {
+            bullet = b;
+            enemy  = a;
+        } else {
+            return; // not a bullet-enemy collision
+        }
+
         if (enemy->hasComponent<FlashOnHitComponent>()) enemy->getComponent<FlashOnHitComponent>().trigger();
         int dmg = bullet->hasComponent<DamageComponent>() ? bullet->getComponent<DamageComponent>().damage : 1;
         if (enemy->hasComponent<EnemyComponent>()) {
@@ -61,5 +60,13 @@ private:
             if (ec.health <= 0) enemy->destroy();
         }
         bullet->destroy();
+    }
+
+private:
+    bool hitsWall(const SDL_Rect& predicted) {
+        for (auto* cc : Game::colliders) {
+            if (cc->tag == "wall" && Collision::AABB(predicted, cc->collider)) return true;
+        }
+        return false;
     }
 };

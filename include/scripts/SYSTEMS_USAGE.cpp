@@ -31,7 +31,7 @@ void exampleInitializeSystems() {
     Game::manager.addSystem<ScriptSystem>();      // Custom logic first
     Game::manager.addSystem<MovementSystem>();    // Then movement
     Game::manager.addSystem<AnimationSystem>();   // Then animations
-    Game::manager.addSystem<CollisionSystem>();   // Then collision detection
+    Game::manager.addSystem<GameCollisionSystem>();   // Then collision detection
     Game::manager.addSystem<RenderSystem>();      // Finally render
 
     // Note: You typically want RenderSystem to be last so it renders
@@ -130,7 +130,7 @@ public:
         // Initialize systems once per scene
         Game::manager.addSystem<MovementSystem>();
         Game::manager.addSystem<AnimationSystem>();
-        Game::manager.addSystem<CollisionSystem>();
+        Game::manager.addSystem<GameCollisionSystem>();
         Game::manager.addSystem<RenderSystem>();
 
         // Create game entities
@@ -193,4 +193,3 @@ public:
  * 4. Order systems efficiently - frequently updated systems first
  * 5. Use entity groups (groupPlayers, groupEnemies) for targeted processing
  */
-

@@ -23,6 +23,9 @@ class EnemyComponent : public Component {
     auto& transform = ensureComponent<TransformComponent>(e, 200, 400, 32, 32, 4);
     auto& sprite    = ensureComponent<SpriteComponent>(e);
     sprite.setTex("assets/enemy.png");  // Always ensure correct texture (safe override)
+    // if (!e.hasComponent<ColliderComponent>()) {
+    //     e.addComponent<ColliderComponent>("enemy");
+    // }
     ensureComponent<ColliderComponent>(e, "enemy");
     ensureComponent<FlashOnHitComponent>(e);
   }

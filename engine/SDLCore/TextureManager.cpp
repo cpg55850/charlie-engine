@@ -18,13 +18,14 @@ SDL_Texture* TextureManager::LoadTexture(const char* texture) {
     return it->second;  // Return the cached texture
   }
 
-  // Load the texture from file
+  // Load raw image data into RAM
   SDL_Surface* tempSurface = IMG_Load(texture);
   if (!tempSurface) {
     std::cerr << "Unable to load image: " << IMG_GetError() << std::endl;
     return nullptr;
   }
 
+  // Create GPU texture from image data
   SDL_Texture* tex = SDL_CreateTextureFromSurface(Game::renderer, tempSurface);
   SDL_FreeSurface(tempSurface);
 
