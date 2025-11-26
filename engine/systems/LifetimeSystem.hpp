@@ -11,34 +11,27 @@
 class LifetimeSystem : public System {
 public:
     void update(Manager& manager, float deltaTime) override {
-        for (auto& entity : manager.getEntities()) {
-            if (!entity->isActive()) continue;
+        // View entities that have LifetimeComponent
+        auto lifetimes = manager.view<LifetimeComponent>();
+        for (auto& tpl : lifetimes) {
+            LifetimeComponent* lifetime = std::get<0>(tpl);
+            // lifetime->entity points to the owner; ensure it's active
+            Entity* owner = lifetime->entity;
+            if (!owner || !owner->isActive()) continue;
 
-            if (entity->hasComponent<LifetimeComponent>()) {
-                auto& lifetime = entity->getComponent<LifetimeComponent>();
+            lifetime->currentLifetime += deltaTime;
+            if (lifetime->currentLifetime >= lifetime->maxLifetime) {
+                owner->destroy();
+                continue;
+            }
 
-                // Update lifetime counter
-                lifetime.currentLifetime += deltaTime;
-
-                // Check if entity has lived too long
-                if (lifetime.currentLifetime >= lifetime.maxLifetime) {
-                    entity->destroy();
-                    continue;
-                }
-
-                // Check if entity is off-screen (if it has a transform)
-                if (lifetime.destroyOffScreen && entity->hasComponent<TransformComponent>()) {
-                    auto& transform = entity->getComponent<TransformComponent>();
-
-                    // Simple bounds check - destroy if too far from origin
-                    if (std::abs(transform.position.x) > lifetime.screenBounds ||
-                        std::abs(transform.position.y) > lifetime.screenBounds) {
-                        entity->destroy();
-                    }
+            if (lifetime->destroyOffScreen && owner->hasComponent<TransformComponent>()) {
+                auto& transform = owner->getComponent<TransformComponent>();
+                if (std::abs(transform.position.x) > lifetime->screenBounds ||
+                    std::abs(transform.position.y) > lifetime->screenBounds) {
+                    owner->destroy();
                 }
             }
         }
     }
 };
-
-

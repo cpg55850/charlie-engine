@@ -25,29 +25,19 @@ public:
     float gravity = 980.0f; // Gravity in units per second squared (9.8 m/s^2 * 100)
 
     void update(Manager& manager, float deltaTime) override {
-        for (auto& entity : manager.getEntities()) {
-            if (!entity->isActive()) continue;
+        auto list = manager.view<PhysicsComponent, TransformComponent>();
+        for (auto& tpl : list) {
+            PhysicsComponent* physics = std::get<0>(tpl);
+            TransformComponent* transform = std::get<1>(tpl);
 
-            // Process entities with both Physics and Transform components
-            if (entity->hasComponent<PhysicsComponent>() &&
-                entity->hasComponent<TransformComponent>()) {
+            if (physics->isStatic) continue;
 
-                auto& physics = entity->getComponent<PhysicsComponent>();
-                auto& transform = entity->getComponent<TransformComponent>();
-
-                // Skip static objects
-                if (physics.isStatic) continue;
-
-                // Apply gravity
-                if (physics.useGravity) {
-                    transform.velocity.y += gravity * physics.gravityScale * deltaTime;
-                }
-
-                // Apply friction (reduces velocity over time)
-                transform.velocity.x *= physics.friction;
-                transform.velocity.y *= physics.friction;
+            if (physics->useGravity) {
+                transform->velocity.y += gravity * physics->gravityScale * deltaTime;
             }
+
+            transform->velocity.x *= physics->friction;
+            transform->velocity.y *= physics->friction;
         }
     }
 };
-

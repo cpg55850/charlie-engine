@@ -10,36 +10,47 @@
 // No InputManager needed - reads keyboard state directly
 class InputSystem : public System {
 public:
-    void update(Manager& manager, float deltaTime) override {
+    void update(Manager& manager, float /*deltaTime*/) override {
         // Get current keyboard state from SDL
         const Uint8* keyboardState = SDL_GetKeyboardState(NULL);
 
-        // Populate InputComponent for all entities that have one
-        for (auto& entity : manager.getEntities()) {
-            if (!entity->isActive()) continue;
-            if (!entity->hasComponent<InputComponent>()) continue;
+        // First, process entities with InputComponent + PlayerIdComponent
+        auto withId = manager.view<InputComponent, PlayerIdComponent>();
+        for (auto& tpl : withId) {
+            InputComponent* input = std::get<0>(tpl);
+            PlayerIdComponent* pidComp = std::get<1>(tpl);
+            int pid = pidComp ? pidComp->id : 0;
+            input->pressedInputs.clear();
+            fillInputs(*input, pid, keyboardState);
+        }
 
-            auto& input = entity->getComponent<InputComponent>();
+        // Then, process entities with only InputComponent
+        auto onlyInput = manager.view<InputComponent>();
+        for (auto& tpl : onlyInput) {
+            InputComponent* input = std::get<0>(tpl);
+            // Determine pid if present via entity pointer
+            Entity* owner = input->entity;
             int pid = 0;
-            if (entity->hasComponent<PlayerIdComponent>()) {
-                pid = entity->getComponent<PlayerIdComponent>().id;
-            }
-            // Clear previous frame states (basic approach)
-            input.pressedInputs.clear();
+            if (owner && owner->hasComponent<PlayerIdComponent>()) pid = owner->getComponent<PlayerIdComponent>().id;
+            input->pressedInputs.clear();
+            fillInputs(*input, pid, keyboardState);
+        }
+    }
 
-            if (pid == 0) {
-                input.setInput("MoveRight", keyboardState[SDL_SCANCODE_D]);
-                input.setInput("MoveLeft",  keyboardState[SDL_SCANCODE_A]);
-                input.setInput("MoveUp",    keyboardState[SDL_SCANCODE_W]);
-                input.setInput("MoveDown",  keyboardState[SDL_SCANCODE_S]);
-                input.setInput("Shoot",     keyboardState[SDL_SCANCODE_SPACE]);
-            } else if (pid == 1) {
-                input.setInput("MoveRight", keyboardState[SDL_SCANCODE_RIGHT]);
-                input.setInput("MoveLeft",  keyboardState[SDL_SCANCODE_LEFT]);
-                input.setInput("MoveUp",    keyboardState[SDL_SCANCODE_UP]);
-                input.setInput("MoveDown",  keyboardState[SDL_SCANCODE_DOWN]);
-                input.setInput("Shoot",     keyboardState[SDL_SCANCODE_RCTRL] || keyboardState[SDL_SCANCODE_RSHIFT]);
-            }
+private:
+    void fillInputs(InputComponent& input, int pid, const Uint8* ks) {
+        if (pid == 0) {
+            input.setInput("MoveRight", ks[SDL_SCANCODE_D]);
+            input.setInput("MoveLeft",  ks[SDL_SCANCODE_A]);
+            input.setInput("MoveUp",    ks[SDL_SCANCODE_W]);
+            input.setInput("MoveDown",  ks[SDL_SCANCODE_S]);
+            input.setInput("Shoot",     ks[SDL_SCANCODE_SPACE]);
+        } else {
+            input.setInput("MoveRight", ks[SDL_SCANCODE_RIGHT]);
+            input.setInput("MoveLeft",  ks[SDL_SCANCODE_LEFT]);
+            input.setInput("MoveUp",    ks[SDL_SCANCODE_UP]);
+            input.setInput("MoveDown",  ks[SDL_SCANCODE_DOWN]);
+            input.setInput("Shoot",     ks[SDL_SCANCODE_RCTRL] || ks[SDL_SCANCODE_RSHIFT]);
         }
     }
 };

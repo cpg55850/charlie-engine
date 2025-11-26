@@ -17,31 +17,40 @@
 class RenderSystem : public System {
 public:
     void update(Manager& manager, float /*dt*/) override {
-        for (auto& entity : manager.getEntities()) {
-            if (!entity->isActive()) continue;
-
-            // Background tiles
-            if (entity->hasComponent<TileComponent>()) {
-                entity->getComponent<TileComponent>().draw();
-            }
-            // Static sprite
-            if (entity->hasComponent<SpriteComponent>()) {
-                if (isFlashing(entity.get())) drawFlash(*entity); else entity->getComponent<SpriteComponent>().draw();
-            }
-            // Animated sprite
-            if (entity->hasComponent<AnimatedSpriteComponent>()) {
-                if (isFlashing(entity.get())) drawFlash(*entity); else entity->getComponent<AnimatedSpriteComponent>().draw();
-            }
-#ifdef DEBUG_COLLIDERS
-            if (entity->hasComponent<ColliderComponent>()) {
-                entity->getComponent<ColliderComponent>().draw();
-            }
-#endif
+        // Draw tiles first
+        auto tiles = manager.view<TileComponent>();
+        for (auto& tpl : tiles) {
+            TileComponent* t = std::get<0>(tpl);
+            t->draw();
         }
+
+        // Static sprites
+        auto sprites = manager.view<SpriteComponent>();
+        for (auto& tpl : sprites) {
+            SpriteComponent* s = std::get<0>(tpl);
+            Entity* owner = s->entity;
+            if (isFlashing(owner)) drawFlash(*owner); else s->draw();
+        }
+
+        // Animated sprites
+        auto anims = manager.view<AnimatedSpriteComponent>();
+        for (auto& tpl : anims) {
+            AnimatedSpriteComponent* a = std::get<0>(tpl);
+            Entity* owner = a->entity;
+            if (isFlashing(owner)) drawFlash(*owner); else a->draw();
+        }
+
+#ifdef DEBUG_COLLIDERS
+        auto cols = manager.view<ColliderComponent>();
+        for (auto& tpl : cols) {
+            ColliderComponent* c = std::get<0>(tpl);
+            c->draw();
+        }
+#endif
     }
 private:
     bool isFlashing(Entity* e) const {
-        return e->hasComponent<FlashOnHitComponent>() && e->getComponent<FlashOnHitComponent>().flashing && e->hasComponent<TransformComponent>();
+        return e && e->hasComponent<FlashOnHitComponent>() && e->getComponent<FlashOnHitComponent>().flashing && e->hasComponent<TransformComponent>();
     }
     void drawFlash(Entity& e) {
         auto& t = e.getComponent<TransformComponent>();

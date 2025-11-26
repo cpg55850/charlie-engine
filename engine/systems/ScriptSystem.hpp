@@ -9,19 +9,22 @@
 class ScriptSystem : public System {
 public:
     void update(Manager& manager, float deltaTime) override {
-        for (auto& entity : manager.getEntities()) {
-            if (!entity->isActive()) continue;
+        // Update PlayerComponent explicitly (primary gameplay logic)
+        auto players = manager.view<PlayerComponent>();
+        for (auto& tpl : players) {
+            PlayerComponent* pc = std::get<0>(tpl);
+            Entity* owner = pc->entity;
+            if (!owner || !owner->isActive()) continue;
+            pc->update(deltaTime);
+        }
 
-            // Update PlayerComponent explicitly (primary gameplay logic)
-            if (entity->hasComponent<PlayerComponent>()) {
-                auto& pc = entity->getComponent<PlayerComponent>();
-                pc.update(deltaTime);
-            }
-            // If any pure ScriptComponent wrappers exist, update them too
-            if (entity->hasComponent<ScriptComponent>()) {
-                auto& sc = entity->getComponent<ScriptComponent>();
-                sc.update(deltaTime);
-            }
+        // Update pure ScriptComponent wrappers
+        auto scripts = manager.view<ScriptComponent>();
+        for (auto& tpl : scripts) {
+            ScriptComponent* sc = std::get<0>(tpl);
+            Entity* owner = sc->entity;
+            if (!owner || !owner->isActive()) continue;
+            sc->update(deltaTime);
         }
     }
 };

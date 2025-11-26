@@ -12,27 +12,21 @@
 class AnimationSystem : public System {
 public:
     void update(Manager& manager, float deltaTime) override {
-        for (auto& entity : manager.getEntities()) {
-            if (!entity->isActive()) continue;
+        // First, process entities that have both AnimatedSpriteComponent and AnimationStateComponent
+        auto both = manager.view<AnimatedSpriteComponent, AnimationStateComponent>();
+        for (auto& tpl : both) {
+            AnimatedSpriteComponent* animSprite = std::get<0>(tpl);
+            AnimationStateComponent* animState = std::get<1>(tpl);
+            selectAnimation(*animSprite, *animState);
+            animSprite->update(deltaTime);
+        }
 
-            // Process entities with both AnimatedSprite and AnimationState
-            if (entity->hasComponent<AnimatedSpriteComponent>() &&
-                entity->hasComponent<AnimationStateComponent>()) {
-
-                auto& animSprite = entity->getComponent<AnimatedSpriteComponent>();
-                auto& animState = entity->getComponent<AnimationStateComponent>();
-
-                // System chooses which animation to play based on state
-                selectAnimation(animSprite, animState);
-
-                // Update the animation frame
-                animSprite.update(deltaTime);
-            }
-            // Fallback: entities without AnimationStateComponent still animate
-            else if (entity->hasComponent<AnimatedSpriteComponent>()) {
-                auto& animSprite = entity->getComponent<AnimatedSpriteComponent>();
-                animSprite.update(deltaTime);
-            }
+        // Then process entities that have only AnimatedSpriteComponent (no state)
+        auto onlyAnim = manager.view<AnimatedSpriteComponent>();
+        for (auto& tpl : onlyAnim) {
+            AnimatedSpriteComponent* animSprite = std::get<0>(tpl);
+            // If the entity also had an AnimationStateComponent it was already processed above.
+            animSprite->update(deltaTime);
         }
     }
 
@@ -75,4 +69,3 @@ private:
         }
     }
 };
-

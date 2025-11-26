@@ -13,22 +13,17 @@
 class CombatSystem : public System {
 public:
     void update(Manager& manager, float deltaTime) override {
-        // Process all entities with CombatComponent
-        for (auto& entity : manager.getEntities()) {
-            if (!entity->isActive()) continue;
+        // Process entities that have CombatComponent and TransformComponent
+        auto list = manager.view<CombatComponent, TransformComponent>();
+        for (auto& tpl : list) {
+            CombatComponent* combat = std::get<0>(tpl);
+            TransformComponent* transform = std::get<1>(tpl);
+            Entity* owner = combat->entity;
+            if (!owner || !owner->isActive()) continue;
 
-            // Only process entities with combat capability
-            if (entity->hasComponent<CombatComponent>() &&
-                entity->hasComponent<TransformComponent>()) {
-
-                auto& combat = entity->getComponent<CombatComponent>();
-                auto& transform = entity->getComponent<TransformComponent>();
-
-                // Check if entity requested to shoot and can shoot
-                if (combat.shootRequested && combat.canShoot()) {
-                    spawnProjectile(manager, transform, combat);
-                    combat.markShot();
-                }
+            if (combat->shootRequested && combat->canShoot()) {
+                spawnProjectile(manager, *transform, *combat);
+                combat->markShot();
             }
         }
     }

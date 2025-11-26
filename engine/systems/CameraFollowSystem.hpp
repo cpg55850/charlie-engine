@@ -8,19 +8,17 @@
 class CameraFollowSystem : public System {
 public:
     void update(Manager& manager, float /*deltaTime*/) override {
-        // Find first entity with CameraFollowComponent + TransformComponent
-        for (auto& ePtr : manager.getEntities()) {
-            if (!ePtr->isActive()) continue;
-            if (ePtr->hasComponent<CameraFollowComponent>() && ePtr->hasComponent<TransformComponent>()) {
-                auto& follow = ePtr->getComponent<CameraFollowComponent>();
-                if (!follow.enabled) continue;
-                auto& tr = ePtr->getComponent<TransformComponent>();
-                int camX = static_cast<int>(tr.position.x + follow.offsetX);
-                int camY = static_cast<int>(tr.position.y + follow.offsetY);
-                Game::camera.update(camX, camY, tr.width, tr.height);
-                break; // follow only first
-            }
+        auto list = manager.view<CameraFollowComponent, TransformComponent>();
+        for (auto& tpl : list) {
+            CameraFollowComponent* follow = std::get<0>(tpl);
+            TransformComponent* tr = std::get<1>(tpl);
+            Entity* owner = follow->entity;
+            if (!owner || !owner->isActive()) continue;
+            if (!follow->enabled) continue;
+            int camX = static_cast<int>(tr->position.x + follow->offsetX);
+            int camY = static_cast<int>(tr->position.y + follow->offsetY);
+            Game::camera.update(camX, camY, tr->width, tr->height);
+            break; // follow only first
         }
     }
 };
-

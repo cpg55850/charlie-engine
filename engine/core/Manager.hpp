@@ -39,6 +39,10 @@ public:
     // Get all entities (for systems to query)
     std::vector<std::unique_ptr<Entity>>& getEntities();
 
+    // Lightweight view: collect pointers to requested components for entities that have them.
+    template<typename... Components>
+    std::vector<std::tuple<Components*...>> view();
+
     // Component accessors (contiguous storage)
     template <typename T>
     T& addComponentToEntity(Entity* entity, EntityID id) { return componentManager.addComponent<T>(id); }
@@ -74,4 +78,23 @@ T& Manager::getSystem() {
         }
     }
     throw std::runtime_error("System not found");
+}
+
+// Implementation of view<Components...>()
+#include <tuple>
+
+template<typename... Components>
+std::vector<std::tuple<Components*...>> Manager::view() {
+    std::vector<std::tuple<Components*...>> result;
+    result.reserve(128);
+
+    for (auto& u : getEntities()) {
+        Entity* e = u.get();
+        if (!e->isActive()) continue;
+        // check all components are present
+        if ((e->hasComponent<Components>() && ...)) {
+            result.emplace_back(&e->getComponent<Components>()...);
+        }
+    }
+    return result;
 }
