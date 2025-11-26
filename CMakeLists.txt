@@ -34,13 +34,33 @@ find_package(SDL2_image CONFIG REQUIRED)
 find_package(SDL2_mixer CONFIG REQUIRED)
 find_package(SDL2_ttf CONFIG REQUIRED)
 
-target_link_libraries(game
-        PRIVATE
-        SDL2::SDL2
-        SDL2::SDL2main
-        SDL2_image::SDL2_image-static
-        SDL2_mixer::SDL2_mixer-static
-        SDL2_ttf::SDL2_ttf-static
+# Function to find either static or dynamic SDL2 target
+function(find_sdl2_package pkg_name)
+    set(dynamic_target "${pkg_name}::${pkg_name}")
+    set(static_target "${pkg_name}::${pkg_name}-static")
+
+    if(TARGET ${dynamic_target})
+        set(${pkg_name}_TARGET ${dynamic_target} PARENT_SCOPE)
+    elseif(TARGET ${static_target})
+        set(${pkg_name}_TARGET ${static_target} PARENT_SCOPE)
+    else()
+        find_package(${pkg_name} CONFIG REQUIRED)
+        set(${pkg_name}_TARGET ${dynamic_target} PARENT_SCOPE)
+    endif()
+endfunction()
+
+# Use it for all SDL packages
+find_sdl2_package(SDL2)
+find_sdl2_package(SDL2_image)
+find_sdl2_package(SDL2_mixer)
+find_sdl2_package(SDL2_ttf)
+
+# Link to the automatically detected targets
+target_link_libraries(game PRIVATE
+        ${SDL2_TARGET}
+        ${SDL2_image_TARGET}
+        ${SDL2_mixer_TARGET}
+        ${SDL2_ttf_TARGET}
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
