@@ -7,6 +7,7 @@
 #include "../../engine/components/TransformComponent.hpp"
 #include "../../engine/components/SpriteComponent.hpp"
 #include "../Game.hpp"
+#include "../components/ProjectileComponent.hpp"
 
 // System that handles combat - spawning projectiles, handling shoot requests
 // This decouples shooting logic from player/enemy scripts
@@ -74,6 +75,8 @@ private:
         auto& sprite = bullet.addComponent<SpriteComponent>();
         sprite.setTex(combat.projectileTexture);
         bullet.addComponent<ColliderComponent>("projectile");
+        // attach owner so projectiles don't hit their spawner
+        if (combat.entity) bullet.addComponent<ProjectileComponent>(combat.entity);
         bullet.addComponent<DamageComponent>(1);
         // std::cout << "CombatSystem: Bullet velocity (" << bulletTransform.velocity.x << ", " << bulletTransform.velocity.y << ")" << std::endl;
 

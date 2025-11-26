@@ -9,11 +9,20 @@
 
 struct PlayerComponent : public Component {
   float speed = 400.0f;  // Units per second (works better with deltaTime)
-  int health = 100;      // optional health
+  int health = 10;       // health in HP; default 10 -> 10 hits of damage=1 kills
   int ammo = 0;          // optional ammo
 
   PlayerComponent() = default;
-  PlayerComponent(float s, int h = 100, int a = 0) : speed(s), health(h), ammo(a) {}
+  PlayerComponent(float s, int h = 10, int a = 0) : speed(s), health(h), ammo(a) {}
 
   void init() override;  // implemented in .cpp to attach required components
+
+  void applyDamage(int dmg) {
+    // Subtract damage from health and destroy player when health <= 0
+    health -= dmg;
+    std::cout << "Player took " << dmg << " damage, health=" << health << "\n";
+    if (health <= 0) {
+      if (entity) entity->destroy();
+    }
+  }
 };

@@ -56,7 +56,14 @@ void MainMenu::onEnter() {
 
   label = createEntity();
   label->addGroup(Game::groupUI);
-  // label->addComponent<LabelComponent>(); // Uncomment when implemented
+  // Create a LabelComponent for HUD health
+  if (font) {
+    auto& hud = *label;
+    hud.addComponent<TransformComponent>(10, 10, 0, 0, 1); // dummy transform for label position
+    auto& lbl = hud.addComponent<LabelComponent>();
+    SDL_Color white{255,255,255,255};
+    lbl.setup(font, "Health: 10", white, &hud.getComponent<TransformComponent>());
+  }
 
   // Projectiles spawned dynamically by CombatSystem
 }
@@ -78,6 +85,12 @@ void MainMenu::update(float deltaTime) {
   if (enemy && enemy->hasComponent<TransformComponent>()) {
     auto& et = enemy->getComponent<TransformComponent>();
     // std::cout << "Enemy pos: (" << et.position.x << ", " << et.position.y << ") vel:(" << et.velocity.x << "," << et.velocity.y << ")" << std::endl;
+  }
+  // Update HUD label with player health
+  if (label && label->hasComponent<LabelComponent>() && player && player->hasComponent<PlayerComponent>()) {
+    auto& pc = player->getComponent<PlayerComponent>();
+    auto& lbl = label->getComponent<LabelComponent>();
+    lbl.setText("Health: " + std::to_string(pc.health));
   }
 }
 

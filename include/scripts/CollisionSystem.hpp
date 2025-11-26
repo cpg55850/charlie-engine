@@ -6,7 +6,10 @@
 #include "../../engine/systems/CollisionSystem.hpp" // inherit from engine system
 #include "Collision.hpp"
 #include "../components/EnemyComponent.hpp"
+#include "../components/PlayerComponent.hpp"
 #include <iostream>
+
+#include "../components/ProjectileComponent.hpp"
 
 // Rename to GameCollisionSystem to avoid conflicting type name with engine::CollisionSystem
 class GameCollisionSystem : public ::CollisionSystem {
@@ -37,28 +40,56 @@ protected:
         auto& ca = a->getComponent<ColliderComponent>();
         auto& cb = b->getComponent<ColliderComponent>();
 
-        // Determine which entity is the bullet and which is the enemy
+        // Determine which entity is the projectile (bullet) and which is the target
         Entity* bullet = nullptr;
-        Entity* enemy  = nullptr;
+        Entity* target = nullptr;
+        if (ca.tag == "projectile") { bullet = a; target = b; }
+        else if (cb.tag == "projectile") { bullet = b; target = a; }
+        else return; // not a projectile-involved collision
 
-        if (ca.tag == "projectile" && cb.tag == "enemy") {
-            bullet = a;
-            enemy  = b;
-        } else if (cb.tag == "projectile" && ca.tag == "enemy") {
-            bullet = b;
-            enemy  = a;
-        } else {
-            return; // not a bullet-enemy collision
+                // Debug: log projectile collision attempt
+        try {
+            auto& bcol = bullet->getComponent<ColliderComponent>();
+            auto& tcol = target->getComponent<ColliderComponent>();
+            // std::cout << "CollisionSystem: projectile collision detected - bullet=" << bullet
+            //           << " tag=" << bcol.tag
+            //           << " rect=(" << bcol.collider.x << "," << bcol.collider.y << "," << bcol.collider.w << "," << bcol.collider.h << ")"
+            //           << " target=" << target
+            //           << " tag=" << tcol.tag
+            //           << " rect=(" << tcol.collider.x << "," << tcol.collider.y << "," << tcol.collider.w << "," << tcol.collider.h << ")\n";
+        } catch (...) {
+            std::cout << "CollisionSystem: debug failed to read collider components" << std::endl;
         }
 
-        if (enemy->hasComponent<FlashOnHitComponent>()) enemy->getComponent<FlashOnHitComponent>().trigger();
+        // Determine damage early
         int dmg = bullet->hasComponent<DamageComponent>() ? bullet->getComponent<DamageComponent>().damage : 1;
-        if (enemy->hasComponent<EnemyComponent>()) {
-            auto& ec = enemy->getComponent<EnemyComponent>();
+
+        // If the projectile has an owner and that owner is the same as the target, ignore
+        if (bullet->hasComponent<ProjectileComponent>()) {
+            auto& pc = bullet->getComponent<ProjectileComponent>();
+            if (pc.owner == target) return; // ignore self-hit
+        }
+
+        // If target is a player, apply damage and destroy projectile
+        if (target->hasComponent<PlayerComponent>()) {
+            auto& player = target->getComponent<PlayerComponent>();
+            player.applyDamage(dmg);
+            bullet->destroy();
+            return;
+        }
+
+        // If target has FlashOnHit, trigger it
+        if (target->hasComponent<FlashOnHitComponent>()) target->getComponent<FlashOnHitComponent>().trigger();
+
+        // If target is an enemy, apply damage to enemy health
+        if (target->hasComponent<EnemyComponent>()) {
+            auto& ec = target->getComponent<EnemyComponent>();
             ec.health -= dmg;
             std::cout << "Enemy health now: " << ec.health << std::endl;
-            if (ec.health <= 0) enemy->destroy();
+            if (ec.health <= 0) target->destroy();
         }
+
+        // Destroy projectile after processing
         bullet->destroy();
     }
 
