@@ -3,7 +3,7 @@
 #include "Game.hpp"
 
 int main(int argc, const char *argv[]) {
-  constexpr int FPS = 60;
+  constexpr int FPS = 144;
   constexpr Uint32 frameDelay = 1000 / FPS;  // ms per frame
 
   Uint32 lastTick = SDL_GetTicks();
