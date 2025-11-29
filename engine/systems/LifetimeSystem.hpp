@@ -12,7 +12,7 @@ class LifetimeSystem : public System {
 public:
     void update(Manager& manager, float deltaTime) override {
         // View entities that have LifetimeComponent
-        auto lifetimes = manager.view<LifetimeComponent>();
+        auto lifetimes = manager.each<LifetimeComponent>();
         for (auto& tpl : lifetimes) {
             LifetimeComponent* lifetime = std::get<0>(tpl);
             // lifetime->entity points to the owner; ensure it's active

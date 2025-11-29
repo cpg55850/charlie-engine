@@ -17,7 +17,12 @@
 #include "../../engine/components/InputComponent.hpp"
 #include "../../engine/components/TransformComponent.hpp"
 #include "../../engine/utils/EntityUtils.hpp"
+#include "../../engine/components/RenderComponent.hpp"
 #include <iostream>
+
+// Add missing component headers used in onCollision
+#include "../../include/components/ProjectileComponent.hpp"
+#include "../../include/components/DamageComponent.hpp"
 
 // Legacy behavior moved to PlayerInputSystem; keep only initial component wiring helper
 // If this file is not needed you can remove it entirely.
@@ -34,6 +39,10 @@ void PlayerComponent::init() {
         sprite.playTex("assets/walk-right.png");
     }
 
+    // Ensure player renders on Entities layer and slightly above tiles
+    auto& render = ensureComponent<RenderComponent>(e, RenderLayer::Entities, 10);
+    render.visible = true;
+
     ensureComponent<ColliderComponent>(e, "player");
     ensureComponent<InputComponent>(e);
     ensureComponent<AnimationStateComponent>(e);
@@ -43,4 +52,27 @@ void PlayerComponent::init() {
         combat.fireRate = 100.0f;
     }
     std::cout << "PlayerComponent::init wiring complete for entity " << &e << std::endl;
+}
+
+void PlayerComponent::onCollision(const CollisionEvent& event) {
+    if (!event.other) return;
+    // If other is a projectile and not owned by this player, take damage and destroy projectile
+    if (event.other->hasComponent<ProjectileComponent>()) {
+        auto& pc = event.other->getComponent<ProjectileComponent>();
+        // Friendly fire check
+        if (pc.owner == this->entity) return;
+
+        int dmg = 1;
+        if (event.other->hasComponent<DamageComponent>()) dmg = event.other->getComponent<DamageComponent>().damage;
+
+        health -= dmg;
+        std::cout << "Player hit! Health: " << health << "\n";
+
+        if (health <= 0) entity->destroy();
+
+        // Destroy the projectile
+        event.other->destroy();
+
+        // TODO: trigger HUD update via event or global state
+    }
 }

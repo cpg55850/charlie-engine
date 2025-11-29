@@ -12,6 +12,8 @@
 class Manager {
 public:
     void update(float deltaTime);
+    void render(float deltaTime); // call systems' render hooks
+    void shutdown(); // call systems' quit hooks
     void refreshGroups();      // Only prunes invalid group members
     void refresh();            // Backwards compatibility: calls both
     Entity& addEntity();
@@ -39,7 +41,11 @@ public:
 
     // Lightweight view: collect pointers to requested components for entities that have them.
     template<typename... Components>
-    std::vector<std::tuple<Components*...>> view();
+    std::vector<std::tuple<Components*...>> each();
+
+    // Backwards-compatibility alias: view(...) -> each(...)
+    template<typename... Components>
+    std::vector<std::tuple<Components*...>> view() { return each<Components...>(); }
 
 
 private:
@@ -74,7 +80,7 @@ T& Manager::getSystem() {
 #include <tuple>
 
 template<typename... Components>
-std::vector<std::tuple<Components*...>> Manager::view() {
+std::vector<std::tuple<Components*...>> Manager::each() {
     std::vector<std::tuple<Components*...>> result;
     result.reserve(128);
 

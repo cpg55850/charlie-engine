@@ -25,7 +25,7 @@ public:
     float gravity = 980.0f; // Gravity in units per second squared (9.8 m/s^2 * 100)
 
     void update(Manager& manager, float deltaTime) override {
-        auto list = manager.view<PhysicsComponent, TransformComponent>();
+        auto list = manager.each<PhysicsComponent, TransformComponent>();
         for (auto& tpl : list) {
             PhysicsComponent* physics = std::get<0>(tpl);
             TransformComponent* transform = std::get<1>(tpl);

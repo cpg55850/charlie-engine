@@ -10,7 +10,7 @@ class ScriptSystem : public System {
 public:
     void update(Manager& manager, float deltaTime) override {
         // Update PlayerComponent explicitly (primary gameplay logic)
-        auto players = manager.view<PlayerComponent>();
+        auto players = manager.each<PlayerComponent>();
         for (auto& tpl : players) {
             PlayerComponent* pc = std::get<0>(tpl);
             Entity* owner = pc->entity;
@@ -19,7 +19,7 @@ public:
         }
 
         // Update pure ScriptComponent wrappers
-        auto scripts = manager.view<ScriptComponent>();
+        auto scripts = manager.each<ScriptComponent>();
         for (auto& tpl : scripts) {
             ScriptComponent* sc = std::get<0>(tpl);
             Entity* owner = sc->entity;

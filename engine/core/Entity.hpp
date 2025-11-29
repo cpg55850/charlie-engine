@@ -7,6 +7,8 @@
 #include <vector>
 #include "ECSConfig.hpp"
 
+#include "Events.hpp" // for CollisionEvent
+
 class Component;  // Forward declare Component class
 class Manager;    // Forward declare Manager class
 
@@ -36,6 +38,9 @@ public:
     template <typename T>
     T& getComponent() const;
 
+    // New: dispatch a collision event to all components (components are private)
+    void sendCollisionEvent(const CollisionEvent& ev);
+
 private:
     Manager& manager;
     bool active = true;
@@ -47,3 +52,6 @@ private:
 
 // Include template implementations after full class definition
 #include "Entity.inl"
+
+// Component template implementations require Entity to be complete
+// (moved to Component.hpp to avoid include cycle)

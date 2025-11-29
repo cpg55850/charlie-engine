@@ -9,7 +9,7 @@ class FlashSystem : public System {
 public:
     void update(Manager& manager, float /*dt*/) override {
         Uint32 now = SDL_GetTicks();
-        auto flashes = manager.view<FlashOnHitComponent>();
+        auto flashes = manager.each<FlashOnHitComponent>();
         for (auto& tpl : flashes) {
             FlashOnHitComponent* flash = std::get<0>(tpl);
             Entity* owner = flash->entity;

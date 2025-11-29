@@ -13,7 +13,7 @@ class EnemyAISystem : public System {
 public:
     void update(Manager& manager, float dt) override {
         // Get player transforms once using the new view helper
-        auto playerTuples = manager.view<TransformComponent, PlayerComponent>();
+        auto playerTuples = manager.each<TransformComponent, PlayerComponent>();
         if (playerTuples.empty()) return;
 
         // Build a compact list of player transforms for fast iteration
@@ -28,7 +28,7 @@ public:
         std::uniform_real_distribution<float> cooldownJitter(0.8f, 1.6f);
 
         // Iterate enemy entities via view to get (Transform, Enemy) pairs directly
-        auto enemyTuples = manager.view<TransformComponent, EnemyComponent>();
+        auto enemyTuples = manager.each<TransformComponent, EnemyComponent>();
         for (auto& tpl : enemyTuples) {
             TransformComponent* et = std::get<0>(tpl);
             EnemyComponent* ec = std::get<1>(tpl);

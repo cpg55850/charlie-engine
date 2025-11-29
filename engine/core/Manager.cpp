@@ -1,5 +1,6 @@
 #include "Manager.hpp"
 #include <algorithm>
+#include <iostream>
 
 void Manager::update(float deltaTime) {
     // Update all systems (they query entities themselves)
@@ -7,6 +8,26 @@ void Manager::update(float deltaTime) {
         system->update(*this, deltaTime);
     }
     // Entity::update removed (entities are passive data containers now)
+}
+
+void Manager::render(float deltaTime) {
+    for (auto& system : systems) {
+        try {
+            system->render(*this, deltaTime);
+        } catch (const std::exception& e) {
+            std::cerr << "Manager::render: system render threw: " << e.what() << "\n";
+        }
+    }
+}
+
+void Manager::shutdown() {
+    for (auto& system : systems) {
+        try {
+            system->quit();
+        } catch (const std::exception& e) {
+            std::cerr << "Manager::shutdown: system quit threw: " << e.what() << "\n";
+        }
+    }
 }
 
 void Manager::refreshGroups() {

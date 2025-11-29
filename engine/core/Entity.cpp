@@ -43,3 +43,10 @@ void Entity::delGroup(Group mGroup) {
 bool Entity::isActive() const {
     return active;
 }
+
+// Dispatch a collision event to all components
+void Entity::sendCollisionEvent(const CollisionEvent& ev) {
+    for (auto& c : components) {
+        if (c) c->onCollision(ev);
+    }
+}

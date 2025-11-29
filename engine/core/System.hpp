@@ -12,5 +12,10 @@ public:
 
     // Optional initialize method for systems that need setup
     virtual void init() {}
-};
 
+    // Optional per-frame render hook for systems that draw UI or overlays
+    virtual void render(Manager& /*manager*/, float /*deltaTime*/) {}
+
+    // Optional shutdown/cleanup hook called when system or engine is shutting down
+    virtual void quit() {}
+};

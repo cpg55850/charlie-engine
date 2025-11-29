@@ -12,7 +12,7 @@ class MovementSystem : public System {
 public:
     void update(Manager& manager, float deltaTime) override {
         // Update transforms and sync colliders when present
-        auto list = manager.view<TransformComponent>();
+        auto list = manager.each<TransformComponent>();
         for (auto& tpl : list) {
             TransformComponent* transform = std::get<0>(tpl);
             Entity* owner = transform->entity;
@@ -31,14 +31,14 @@ public:
         }
 
         // Update static sprites
-        auto sprites = manager.view<SpriteComponent>();
+        auto sprites = manager.each<SpriteComponent>();
         for (auto& tpl : sprites) {
             SpriteComponent* s = std::get<0>(tpl);
             s->update(deltaTime);
         }
 
         // Update animated sprites
-        auto anims = manager.view<AnimatedSpriteComponent>();
+        auto anims = manager.each<AnimatedSpriteComponent>();
         for (auto& tpl : anims) {
             AnimatedSpriteComponent* a = std::get<0>(tpl);
             a->update(deltaTime);

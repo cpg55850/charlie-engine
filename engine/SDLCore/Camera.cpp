@@ -22,3 +22,21 @@ void Camera::render(int playerX, int playerY) {
   y = playerY * 0.01;
   std::cout << playerX << " " << playerY << std::endl;
 }
+
+bool Camera::rectIntersects(const SDL_Rect& r) const {
+    int camLeft = static_cast<int>(x) - (width / 2);
+    int camTop = static_cast<int>(y) - (height / 2);
+    int camRight = camLeft + width;
+    int camBottom = camTop + height;
+
+    int rLeft = r.x;
+    int rTop = r.y;
+    int rRight = r.x + r.w;
+    int rBottom = r.y + r.h;
+
+    if (rRight < camLeft) return false;
+    if (rLeft > camRight) return false;
+    if (rBottom < camTop) return false;
+    if (rTop > camBottom) return false;
+    return true;
+}

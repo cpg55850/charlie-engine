@@ -20,6 +20,10 @@
 #include "scenes/MainMenu.hpp"
 #include "../include/components/ScriptComponents.hpp"
 #include "../include/scripts/FlashSystem.hpp"
+#include "../engine/ui/HUD.hpp"
+#include "../../include/components/PlayerComponent.hpp"
+#include "scripts/HUDSystem.hpp"
+#include "scripts/RenderSystem.hpp"
 
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
@@ -69,6 +73,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     // Load audio, fonts, scenes
     audioManager.loadAudio("assets/laserShoot.wav", "laser");
     FontLoader::init();
+    HUD::init(renderer, "assets/fonts/zig.ttf", 24);
 
     SceneFactory::instance().registerScene(
         "MainMenu", []() { return std::make_unique<MainMenu>(); });
@@ -86,6 +91,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height,
     if (!manager.hasSystem<AnimationSystem>()) manager.addSystem<AnimationSystem>();    // 7. Animate sprites
     if (!manager.hasSystem<CameraFollowSystem>()) manager.addSystem<CameraFollowSystem>(); // 8. Update camera
     if (!manager.hasSystem<RenderSystem>()) manager.addSystem<RenderSystem>();          // 9. Draw everything
+    if (!manager.hasSystem<GameHUDSystem>()) manager.addSystem<GameHUDSystem>();      // 10. HUD overlay system
 
     // Load initial scene
     sceneManager.switchScene("MainMenu");
@@ -106,20 +112,29 @@ void Game::update(float deltaTime) {
 void Game::render() {
   SDL_RenderClear(renderer);
   // Run render system now (draw happens after clear)
-  try {
-    auto &renderSystem = manager.getSystem<RenderSystem>();
-    renderSystem.update(manager, 0.f); // deltaTime not needed for drawing
-  } catch (const std::exception &e) {
-    // RenderSystem might not be registered yet
-  }
+  // try {
+  //   auto &renderSystem = manager.getSystem<RenderSystem>();
+  //   renderSystem.update(manager, 0.f); // deltaTime not needed for drawing
+  // } catch (const std::exception &e) {
+  //   std::cerr << "RenderSystem exception: " << e.what() << '\n';
+  // }
   // Scene-specific overlays (UI) can still draw
   sceneManager.draw();
+
+  // Render system-level render hooks (draw UI overlays from systems)
+  manager.render(0.f);
+
+  // HUD was previously managed explicitly; now systems' render() will be called via manager.render
+
   SDL_RenderPresent(renderer);
 }
 
 void Game::clean() {
   SDL_DestroyWindow(window);
   SDL_DestroyRenderer(renderer);
+  // Shutdown systems
+  manager.shutdown();
+  HUD::quit();
   FontLoader::quit();
   SDL_Quit();
   std::cout << "Game cleaned" << std::endl;

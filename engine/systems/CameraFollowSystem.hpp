@@ -8,7 +8,7 @@
 class CameraFollowSystem : public System {
 public:
     void update(Manager& manager, float /*deltaTime*/) override {
-        auto list = manager.view<CameraFollowComponent, TransformComponent>();
+        auto list = manager.each<CameraFollowComponent, TransformComponent>();
         for (auto& tpl : list) {
             CameraFollowComponent* follow = std::get<0>(tpl);
             TransformComponent* tr = std::get<1>(tpl);

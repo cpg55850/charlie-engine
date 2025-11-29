@@ -15,7 +15,7 @@ class CombatSystem : public System {
 public:
     void update(Manager& manager, float deltaTime) override {
         // Process entities that have CombatComponent and TransformComponent
-        auto list = manager.view<CombatComponent, TransformComponent>();
+        auto list = manager.each<CombatComponent, TransformComponent>();
         for (auto& tpl : list) {
             CombatComponent* combat = std::get<0>(tpl);
             TransformComponent* transform = std::get<1>(tpl);

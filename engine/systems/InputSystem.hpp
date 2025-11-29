@@ -15,7 +15,7 @@ public:
         const Uint8* keyboardState = SDL_GetKeyboardState(NULL);
 
         // First, process entities with InputComponent + PlayerIdComponent
-        auto withId = manager.view<InputComponent, PlayerIdComponent>();
+        auto withId = manager.each<InputComponent, PlayerIdComponent>();
         for (auto& tpl : withId) {
             InputComponent* input = std::get<0>(tpl);
             PlayerIdComponent* pidComp = std::get<1>(tpl);
@@ -25,7 +25,7 @@ public:
         }
 
         // Then, process entities with only InputComponent
-        auto onlyInput = manager.view<InputComponent>();
+        auto onlyInput = manager.each<InputComponent>();
         for (auto& tpl : onlyInput) {
             InputComponent* input = std::get<0>(tpl);
             // Determine pid if present via entity pointer

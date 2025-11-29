@@ -5,6 +5,7 @@
 #include "../components/TransformComponent.hpp"
 #include "../components/ColliderComponent.hpp"
 #include "../SDLCore/Collision.hpp"
+#include "../core/Events.hpp"
 #include <algorithm>
 #include <vector>
 
@@ -82,6 +83,14 @@ public:
 
                 // Final precise AABB test (uses component rects)
                 if (Collision::AABB(*A.col, *B.col)) {
+                    // Dispatch collision events to entities via their helper
+                    CollisionEvent evA{A.ent, B.ent};
+                    CollisionEvent evB{B.ent, A.ent};
+
+                    A.ent->sendCollisionEvent(evA);
+                    B.ent->sendCollisionEvent(evB);
+
+                    // Then call virtual hook for project specific handling
                     onOverlap(A.ent, B.ent);
                 }
             }

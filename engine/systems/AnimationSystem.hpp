@@ -13,7 +13,7 @@ class AnimationSystem : public System {
 public:
     void update(Manager& manager, float deltaTime) override {
         // First, process entities that have both AnimatedSpriteComponent and AnimationStateComponent
-        auto both = manager.view<AnimatedSpriteComponent, AnimationStateComponent>();
+        auto both = manager.each<AnimatedSpriteComponent, AnimationStateComponent>();
         for (auto& tpl : both) {
             AnimatedSpriteComponent* animSprite = std::get<0>(tpl);
             AnimationStateComponent* animState = std::get<1>(tpl);
@@ -22,7 +22,7 @@ public:
         }
 
         // Then process entities that have only AnimatedSpriteComponent (no state)
-        auto onlyAnim = manager.view<AnimatedSpriteComponent>();
+        auto onlyAnim = manager.each<AnimatedSpriteComponent>();
         for (auto& tpl : onlyAnim) {
             AnimatedSpriteComponent* animSprite = std::get<0>(tpl);
             // If the entity also had an AnimationStateComponent it was already processed above.

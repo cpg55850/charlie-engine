@@ -14,6 +14,10 @@
 #include "../../engine/components/InputComponent.hpp"
 #include "../components/DamageComponent.hpp"
 #include "../components/FlashOnHitComponent.hpp"
+#include "../../engine/components/RenderComponent.hpp"
+
+// Convenience alias for game code
+using RenderLayer = engine::render::RenderLayer;
 
 // Forward declare new components from system headers
 // They are defined in their respective system files

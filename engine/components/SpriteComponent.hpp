@@ -6,6 +6,7 @@
 #include "Animation.hpp"
 #include "../../include/scripts/Components.hpp"
 #include "SDL.h"
+#include "../systems/RenderLayer.hpp"
 
 class SpriteComponent : public Component {
  public:
@@ -39,6 +40,10 @@ class SpriteComponent : public Component {
     destRect.w = transform->width * transform->scale;
     destRect.h = transform->height * transform->scale;
   }
+
+  // Render ordering control (engine-agnostic)
+  engine::render::RenderLayer layer = engine::render::RenderLayer::Entities;
+  int zOffset = 0;
 
  private:
   TransformComponent* transform;
