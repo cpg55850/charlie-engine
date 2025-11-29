@@ -10,6 +10,8 @@
 #include <iostream>
 
 #include "../components/ProjectileComponent.hpp"
+#include "../components/DamageComponent.hpp"
+#include "../../engine/core/EventBus.hpp"
 
 // Rename to GameCollisionSystem to avoid conflicting type name with engine::CollisionSystem
 class GameCollisionSystem : public ::CollisionSystem {
@@ -54,8 +56,35 @@ public:
 
 protected:
     // We no longer handle per-component damage here; engine dispatches events to components.
-    void onOverlap(class Entity* /*a*/, class Entity* /*b*/) override {
-        // Intentionally empty: components handle collision responses via onCollision callbacks
+    void onOverlap(class Entity* a, class Entity* b) override {
+        // Publish OnHit events when a projectile hits a target -- avoid friendly fire
+        using engine::events::GetEventBus;
+
+        // Helper to process projectile hits
+        auto processProjectileHit = [&](Entity* projEntity, Entity* targetEntity) {
+            if (!projEntity || !targetEntity) return;
+            if (!projEntity->hasComponent<ProjectileComponent>()) return;
+
+            auto &pc = projEntity->getComponent<ProjectileComponent>();
+            // Ignore if projectile owner is the target (friendly fire prevention)
+            if (pc.owner == targetEntity) return;
+
+            int dmg = 1;
+            if (projEntity->hasComponent<DamageComponent>()) dmg = projEntity->getComponent<DamageComponent>().damage;
+
+            // Publish a decoupled OnHit event: target was hit by projectile
+            GetEventBus().publishEvent<engine::events::OnHitEvent>(targetEntity, projEntity, dmg);
+
+            // Destroy the projectile entity (bullets are single-use)
+            projEntity->destroy();
+        };
+
+        // If a is projectile -> hits b
+        processProjectileHit(a, b);
+        // If b is projectile -> hits a
+        processProjectileHit(b, a);
+
+        // Note: components may still receive their synchronous CollisionEvent via Entity::sendCollisionEvent
     }
 
 private:

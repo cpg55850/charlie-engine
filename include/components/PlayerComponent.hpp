@@ -17,7 +17,4 @@ class PlayerComponent : public Component {
     PlayerComponent(float s, int h = 10, int a = 0) : speed(s), health(h), ammo(a) {}
 
     void init() override;  // implemented in .cpp to attach required components
-
-    // React to collisions via event bus
-    void onCollision(const CollisionEvent& event) override;
 };

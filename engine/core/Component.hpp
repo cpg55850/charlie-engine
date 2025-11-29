@@ -25,9 +25,6 @@ public:
     // Helper to test ownership
     bool hasEntity() const noexcept { return entity != nullptr; }
 
-    // Event hook: components can override to receive collision events
-    virtual void onCollision(const CollisionEvent& /*event*/) {}
-
     virtual ~Component() = default;
 };
 

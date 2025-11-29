@@ -38,9 +38,6 @@ public:
     template <typename T>
     T& getComponent() const;
 
-    // New: dispatch a collision event to all components (components are private)
-    void sendCollisionEvent(const CollisionEvent& ev);
-
 private:
     Manager& manager;
     bool active = true;

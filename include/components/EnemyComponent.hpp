@@ -11,6 +11,7 @@
 #include "../../engine/utils/Vector2D.hpp"
 #include "../../engine/utils/EntityUtils.hpp"
 #include "../../engine/components/RenderComponent.hpp"
+#include "../../engine/core/EventBus.hpp"
 
 // Include projectile/damage components for collision handling
 #include "../components/ProjectileComponent.hpp"
@@ -44,15 +45,16 @@ class EnemyComponent : public Component {
     ensureComponent<ColliderComponent>(e, "enemy");
     ensureComponent<FlashOnHitComponent>(e);
 
-    // Debug: print current working directory and check asset existence
-    try {
-      auto cwd = std::filesystem::current_path();
-      std::cout << "EnemyComponent::init cwd=" << cwd << "\n";
-      std::filesystem::path p = cwd / "assets/enemy.png";
-      std::cout << "Enemy asset exists: " << (std::filesystem::exists(p) ? "yes" : "no") << " -> " << p << "\n";
-    } catch (...) {
-      std::cout << "EnemyComponent::init: unable to query filesystem\n";
-    }
+    // Subscribe to OnHitEvent to apply damage via event bus
+    using engine::events::GetEventBus;
+    GetEventBus().subscribe<engine::events::OnHitEvent>([this](std::shared_ptr<engine::events::OnHitEvent> ev) {
+        if (!ev) return;
+        if (ev->target != this->entity) return;
+        this->health -= ev->damage;
+        std::cout << "Enemy hit via EventBus! Health=" << this->health << "\n";
+        if (this->health <= 0) this->entity->destroy();
+    });
+
 
     std::cout << "Enemy transform pos=(" << transform.position.x << "," << transform.position.y << ") scale=" << transform.scale << "\n";
   }
@@ -60,22 +62,22 @@ class EnemyComponent : public Component {
   // No behavior in the component itself - AI systems drive movement and shooting
   void draw() override {}
 
-  // React to collisions
-  void onCollision(const CollisionEvent& event) override {
-    if (!event.other) return;
-    if (event.other->hasComponent<ProjectileComponent>()) {
-      auto& pc = event.other->getComponent<ProjectileComponent>();
-      if (pc.owner == this->entity) return; // ignore self-hit from own projectile
-
-      int dmg = 1;
-      if (event.other->hasComponent<DamageComponent>()) dmg = event.other->getComponent<DamageComponent>().damage;
-
-      health -= dmg;
-      std::cout << "Enemy hit! Health: " << health << "\n";
-      if (health <= 0) entity->destroy();
-
-      // Destroy projectile
-      event.other->destroy();
-    }
-  }
+  // // React to collisions
+  // void onCollision(const CollisionEvent& event) override {
+  //   if (!event.other) return;
+  //   if (event.other->hasComponent<ProjectileComponent>()) {
+  //     auto& pc = event.other->getComponent<ProjectileComponent>();
+  //     if (pc.owner == this->entity) return; // ignore self-hit from own projectile
+  //
+  //     int dmg = 1;
+  //     if (event.other->hasComponent<DamageComponent>()) dmg = event.other->getComponent<DamageComponent>().damage;
+  //
+  //     health -= dmg;
+  //     std::cout << "Enemy hit! Health: " << health << "\n";
+  //     if (health <= 0) entity->destroy();
+  //
+  //     // Destroy projectile
+  //     event.other->destroy();
+  //   }
+  // }
 };
